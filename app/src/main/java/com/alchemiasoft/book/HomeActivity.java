@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alchemiasoft.android_wear_tutorial;
+package com.alchemiasoft.book;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
