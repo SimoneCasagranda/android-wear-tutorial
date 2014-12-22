@@ -14,20 +14,33 @@
  * limitations under the License.
  */
 
-package com.alchemiasoft.book;
+package com.alchemiasoft.book.activity;
 
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.alchemiasoft.book.R;
+import com.alchemiasoft.book.fragment.BooksFragment;
 
+/**
+ * Activity that decides weather to display available books or owned books.
+ * <p/>
+ * Created by Simone Casagranda on 20/12/14.
+ */
 public class HomeActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        // Checking if first instance and then attach the first fragment
+        if (savedInstanceState == null) {
+            final Fragment fragment = BooksFragment.create(this, false);
+            getSupportFragmentManager().beginTransaction().replace(R.id.content, fragment).commit();
+        }
     }
 
 

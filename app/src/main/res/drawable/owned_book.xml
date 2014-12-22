@@ -14,13 +14,9 @@
   ~ limitations under the License.
   -->
 
-<resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
 
-    <string name="app_name">android-wear-tutorial</string>
-    <string name="action_settings">Settings</string>
+    <solid android:color="@color/gray" />
 
-    <string name="loading">Loading...</string>
-    <string name="empty">Empty</string>
-    <string name="no_books">No books available</string>
-
-</resources>
+</shape>
