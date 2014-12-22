@@ -31,6 +31,7 @@ import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.fragment.base.RecyclerViewFragment;
 import com.alchemiasoft.book.loader.BooksLoader;
 import com.alchemiasoft.book.model.Book;
+import com.alchemiasoft.book.util.ViewUtil;
 import com.alchemiasoft.book.widget.SmartSwipeRefreshLayout;
 
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
     /**
      * Number of columns shown to the user.
      */
-    private static final int COLUMN_COUNT = 1;
+    private static final int COLUMN_COUNT = 2;
 
     /**
      * Id used for the book(s) loader.
@@ -173,8 +174,11 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
             final Book book = mBooks.get(pos);
             bookHolder.mTitleTextView.setText(book.getTitle());
             bookHolder.mAuthorTextView.setText(book.getAuthor());
-            bookHolder.mOwnedView.setBackgroundResource(book.isOwned() ? null : R.drawable.owned_book);
-
+            if (book.isOwned()) {
+                bookHolder.mOwnedView.setBackgroundResource(R.drawable.owned_book);
+            } else {
+                ViewUtil.setBackground(bookHolder.mOwnedView, null);
+            }
         }
 
         @Override

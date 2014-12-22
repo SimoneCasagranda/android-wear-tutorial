@@ -16,6 +16,7 @@
 
 package com.alchemiasoft.book.model;
 
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 
@@ -31,7 +32,9 @@ import java.util.List;
  */
 public class Book {
 
-    private long mId;
+    public static final long NOT_VALID = -1L;
+
+    private long mId = NOT_VALID;
 
     private String mTitle;
     private String mAuthor;
@@ -39,6 +42,15 @@ public class Book {
     private boolean mOwned;
 
     private Book() {
+    }
+
+    public static Book create(String title, String author, int pages, boolean owned) {
+        final Book book = new Book();
+        book.mTitle = title;
+        book.mAuthor = author;
+        book.mPages = pages;
+        book.mOwned = owned;
+        return book;
     }
 
     public static Book oneFrom(@NonNull Cursor c) {
@@ -69,6 +81,15 @@ public class Book {
             books.add(book);
         }
         return books;
+    }
+
+    public ContentValues toValues() {
+        final ContentValues cv = new ContentValues();
+        cv.put(BookDB.Book.TITLE, mTitle);
+        cv.put(BookDB.Book.AUTHOR, mAuthor);
+        cv.put(BookDB.Book.PAGES, mPages);
+        cv.put(BookDB.Book.OWNED, mOwned);
+        return cv;
     }
 
     public long getId() {
