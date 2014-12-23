@@ -23,6 +23,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -75,7 +76,7 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
     }
 
     private BooksAdapter mAdapter;
-    private GridLayoutManager mLayoutManager;
+    private StaggeredGridLayoutManager mLayoutManager;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -85,7 +86,7 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
         // Set up adapter and recycler view
         mAdapter = new BooksAdapter();
         setRecyclerAdapter(mAdapter);
-        mLayoutManager = new GridLayoutManager(getActivity(), COLUMN_COUNT, GridLayoutManager.VERTICAL, false);
+        mLayoutManager = new StaggeredGridLayoutManager(COLUMN_COUNT, GridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setHasFixedSize(true);
         setScrollInterceptor(new SmartSwipeRefreshLayout.ScrollInterceptor() {

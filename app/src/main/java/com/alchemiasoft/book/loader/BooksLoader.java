@@ -16,11 +16,15 @@
 
 package com.alchemiasoft.book.loader;
 
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v4.content.AsyncTaskLoader;
 
+import com.alchemiasoft.book.content.BookDB;
 import com.alchemiasoft.book.model.Book;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,6 +33,9 @@ import java.util.List;
  * Created by Simone Casagranda on 20/12/14.
  */
 public class BooksLoader extends AsyncTaskLoader<List<Book>> {
+
+    private static final String SELECTION = BookDB.Book.OWNED + " = ?";
+    private static final String[] SELEC_OWNED = {String.valueOf(1)};
 
     private List<Book> mData;
 
@@ -41,7 +48,15 @@ public class BooksLoader extends AsyncTaskLoader<List<Book>> {
 
     @Override
     public List<Book> loadInBackground() {
-        return null;
+        final List<Book> books = new ArrayList<>();
+        final ContentResolver cr = getContext().getContentResolver();
+        final Cursor c = mOwned ? cr.query(BookDB.Book.CONTENT_URI, null, SELECTION, SELEC_OWNED, null) : cr.query(BookDB.Book.CONTENT_URI, null, null, null, null);
+        try {
+            books.addAll(Book.allFrom(c));
+        } finally {
+            c.close();
+        }
+        return books;
     }
 
     @Override

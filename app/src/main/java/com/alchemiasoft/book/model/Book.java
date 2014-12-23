@@ -22,6 +22,9 @@ import android.support.annotation.NonNull;
 
 import com.alchemiasoft.book.content.BookDB;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +81,23 @@ public class Book {
         final List<Book> books = new ArrayList<>();
         while (c.moveToNext()) {
             final Book book = oneFrom(c);
+            books.add(book);
+        }
+        return books;
+    }
+
+    public static Book oneFrom(@NonNull JSONObject json) {
+        final Book book = new Book();
+        book.mTitle = json.optString("title");
+        book.mAuthor = json.optString("author");
+        book.mPages = json.optInt("pages");
+        return book;
+    }
+
+    public static List<Book> allFrom(@NonNull JSONArray jsonArr) {
+        final List<Book> books = new ArrayList<>();
+        for (int i = 0; i < jsonArr.length(); i++) {
+            final Book book = oneFrom(jsonArr.optJSONObject(i));
             books.add(book);
         }
         return books;

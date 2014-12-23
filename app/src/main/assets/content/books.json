@@ -1,0 +1,127 @@
+[
+    {
+        "title": "Professional Android 4 Application Development",
+        "author": "Reto Meier",
+        "pages": 817
+    },
+    {
+        "title": "Sviluppare Applicazioni per Android",
+        "author": "Massimo Carli",
+        "pages": 432
+    },
+    {
+        "title": "Android: Guida per lo Sviluppatore",
+        "author": "Massimo Carli",
+        "pages": 565
+    },
+    {
+        "title": "Java Cryptography",
+        "author": "Jonathan Knudsen",
+        "pages": 0
+    },
+    {
+        "title": "RESTful Java Web Services",
+        "author": "Jose Sandoval",
+        "pages": 258
+    },
+    {
+        "title": "RESTful Web Services",
+        "author": "Leonard Richardson, Sam Ruby",
+        "pages": 419
+    },
+    {
+        "title": "Head First Design Patterns",
+        "author": "Eric Freeman, Elisabeth Robson, Bert Bates, Kathy Sierra",
+        "pages": 638
+    },
+    {
+        "title": "Beginning PhoneGapMobile Web Framework for JavaScript and HTML5",
+        "author": "Rohit Ghatol , Yogesh Patel",
+        "pages": 344
+    },
+    {
+        "title": "Pro Android 4",
+        "author": "Satya Komatineni, Dave MacLean",
+        "pages": 1020
+    },
+    {
+        "title": "Version Control with Git",
+        "author": "Jon Loeliger",
+        "pages": 330
+    },
+    {
+        "title": "Application Security for the Android Platform",
+        "author": "Jeff Six",
+        "pages": 114
+    },
+    {
+        "title": "Android App Security",
+        "author": "Sheran A. Gunasekera",
+        "pages": 248
+    },
+    {
+        "title": "Pro Android Media",
+        "author": "Shawn Van Every",
+        "pages": 320
+    },
+    {
+        "title": "Android Application Development Cookbook",
+        "author": "Wei Meng Lee",
+        "pages": 408
+    },
+    {
+        "title": "Android Recipes: a problem-solution approach",
+        "author": "Dave Smith, Jeff Frisen",
+        "pages": 456
+    },
+    {
+        "title": "50 Android Hacks",
+        "author": "Carlos Sessa",
+        "pages": 216
+    },
+    {
+        "title": "Pro Android Apps Performance Optimization",
+        "author": "Hervé Guihot",
+        "pages": 288
+    },
+    {
+        "title": "Expert Android",
+        "author": "Satya Komatineni & Dave MacLean",
+        "pages": 436
+    },
+    {
+        "title": "Android Developer Tools Essentials",
+        "author": "Mike Wolfson",
+        "pages": 250
+    },
+    {
+        "title": "Functional Programming for Java Developers",
+        "author": "Dean Wampler",
+        "pages": 90
+    },
+    {
+        "title": "Programming Concurrency on the JVM",
+        "author": "Venkat Subramaniam",
+        "pages": 280
+    },
+    {
+        "title": "Java Concurrency In Practice",
+        "author": "Brian Göetz, Tim Peierls, Joshua Bloch, Joseph Bowbeer, David Holmes & Doug Lea",
+        "pages": 384
+    },
+    {
+        "title": "Pro Android Graphics",
+        "author": "Wallace Jackson",
+        "pages": 620
+    },
+    {
+        "title": "Android Best Practices",
+        "author": "Godfrey Nolan",
+        "pages": 232
+    },
+    {
+        "title": "Design Patterns: Elements of Reusable Object-Oriented Software",
+        "author": "Erich Gamma, Richard Helm, Ralph Johnson, John Vlissides",
+        "pages": -1
+    }
+]

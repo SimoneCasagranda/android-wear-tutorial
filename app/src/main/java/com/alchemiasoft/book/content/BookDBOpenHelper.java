@@ -19,7 +19,16 @@ package com.alchemiasoft.book.content;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.alchemiasoft.book.app.Constants;
+import com.alchemiasoft.book.model.Book;
+import com.alchemiasoft.book.util.ResUtil;
+
+import org.json.JSONArray;
+
+import java.util.List;
 
 /**
  * SQLiteOpenHelper that creates the SQLite database for the Book application.
@@ -33,8 +42,11 @@ public class BookDBOpenHelper extends SQLiteOpenHelper {
      */
     private static final String TAG_LOG = BookDBOpenHelper.class.getSimpleName();
 
+    private final Context mContext;
+
     public BookDBOpenHelper(Context context) {
         super(context, BookDB.NAME, null, BookDB.VERSION);
+        mContext = context.getApplicationContext();
     }
 
     @Override
@@ -43,6 +55,23 @@ public class BookDBOpenHelper extends SQLiteOpenHelper {
             db.beginTransaction();
 
             db.execSQL(BookDB.Book.CREATE_TABLE);
+
+            String input = null;
+            try {
+                input = ResUtil.assetAsString(mContext, Constants.BOOKS_PATH);
+            } catch (Exception e) {
+                Log.e(TAG_LOG, "Cannot read the input at assets/" + Constants.BOOKS_PATH);
+            }
+            // Adding the default entries
+            if (!TextUtils.isEmpty(input)) {
+                Log.d(TAG_LOG, "Adding into the DB: " + input);
+                final JSONArray arr = new JSONArray(input);
+                final List<Book> books = Book.allFrom(arr);
+                // Adding the all the books as a batch
+                for (final Book book : books) {
+                    db.insert(BookDB.Book.TABLE, null, book.toValues());
+                }
+            }
 
             db.setTransactionSuccessful();
             Log.i(TAG_LOG, "Successfully created " + BookDB.NAME);

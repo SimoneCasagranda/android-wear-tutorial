@@ -35,7 +35,7 @@
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:layout_alignParentRight="true"
-            tools:background="@color/gray" />
+            tools:background="@color/accent" />
 
         <TextView
             android:id="@+id/title"
@@ -59,7 +59,8 @@
             android:layout_alignParentLeft="true"
             android:textSize="14sp"
             android:gravity="bottom"
-            tools:text="Author" />
+            tools:text="Author"
+            android:ellipsize="end" />
     </RelativeLayout>
 
 </android.support.v7.widget.CardView>
