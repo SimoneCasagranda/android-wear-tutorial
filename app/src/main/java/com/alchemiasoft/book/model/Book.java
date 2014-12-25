@@ -131,4 +131,24 @@ public class Book {
     public boolean isOwned() {
         return mOwned;
     }
+
+    public void setId(long mId) {
+        this.mId = mId;
+    }
+
+    public void setTitle(String mTitle) {
+        this.mTitle = mTitle;
+    }
+
+    public void setAuthor(String mAuthor) {
+        this.mAuthor = mAuthor;
+    }
+
+    public void setPages(int mPages) {
+        this.mPages = mPages;
+    }
+
+    public void setOwned(boolean mOwned) {
+        this.mOwned = mOwned;
+    }
 }

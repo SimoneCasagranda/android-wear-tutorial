@@ -25,5 +25,9 @@
     <string name="all_books">All</string>
     <string name="owned_books">My Books</string>
     <string name="not_implemented">Not yet implemented!</string>
+    <string name="action_buy">Buy</string>
+    <string name="book_already_owned">You already own this book.</string>
+    <string name="book_not_owned">You don\'t have this book.</string>
+    <string name="action_sell">Sell</string>
 
 </resources>

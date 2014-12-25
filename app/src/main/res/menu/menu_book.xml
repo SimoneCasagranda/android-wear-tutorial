@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2014 Simone Casagranda.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,9 +14,13 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <!-- Default screen margins, per the Android Design guidelines. -->
-    <dimen name="padding_recycler_view">3dp</dimen>
-    <dimen name="padding_card">8dp</dimen>
-    <dimen name="overflow_size">35dp</dimen>
-</resources>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".HomeActivity">
+    <item
+        android:id="@+id/action_buy"
+        android:title="@string/action_buy" />
+    <item
+        android:id="@+id/action_sell"
+        android:title="@string/action_sell" />
+</menu>

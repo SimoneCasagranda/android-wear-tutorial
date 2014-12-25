@@ -30,11 +30,23 @@
         android:layout_height="wrap_content"
         android:padding="@dimen/padding_card">
 
+        <ImageView
+            android:id="@+id/menu_overflow"
+            android:layout_width="@dimen/overflow_size"
+            android:layout_height="@dimen/overflow_size"
+            android:layout_marginTop="3dp"
+            android:paddingLeft="10dp"
+            android:paddingBottom="10dp"
+            android:layout_alignParentRight="true"
+            android:clickable="true"
+            android:src="@drawable/ic_action_overflow" />
+
         <View
             android:id="@+id/owned_book"
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             tools:background="@color/accent" />
 
         <TextView
