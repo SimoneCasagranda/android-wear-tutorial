@@ -30,4 +30,7 @@
     <string name="book_not_owned">You don\'t have this book.</string>
     <string name="action_sell">Sell</string>
 
+    <string name="title_book_suggestion">Book suggestion</string>
+    <string name="content_book_suggestion">Looking at your library you might be interested in reading:\n\n%1$s by %2$s</string>
+
 </resources>

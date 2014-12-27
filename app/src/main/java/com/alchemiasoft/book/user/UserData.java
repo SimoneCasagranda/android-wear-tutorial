@@ -33,6 +33,22 @@ public class UserData {
     private static final long DOES_NOT_EXPIRE = Long.MAX_VALUE;
 
     public static final String KEY_USERNAME = "username";
+    public static final String KEY_SUGGESTION_INTERVAL = "suggestion_interval";
+
+    public static enum SuggestionInterval {
+
+        NEVER(-1), NOW(0), TEN_SECS(10), TWENTY_SECS(20), THIRTY_SECS(30);
+
+        private final int mSeconds;
+
+        SuggestionInterval(int seconds) {
+            mSeconds = seconds;
+        }
+
+        public int seconds() {
+            return mSeconds;
+        }
+    }
 
     private final Context mContext;
     private final SharedPreferences mPrefs;
@@ -47,6 +63,7 @@ public class UserData {
         mPrefs = mContext.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
         mValues = new ContentValues();
         username(mPrefs.getString(KEY_USERNAME, null));
+        suggestionInterval(suggestionInterval(mPrefs.getInt(KEY_SUGGESTION_INTERVAL, SuggestionInterval.NOW.ordinal())));
     }
 
     /**
@@ -74,5 +91,20 @@ public class UserData {
 
     public String username() {
         return mValues.getAsString(KEY_USERNAME);
+    }
+
+    public UserData suggestionInterval(@NonNull SuggestionInterval interval) {
+        mValues.put(KEY_SUGGESTION_INTERVAL, interval.ordinal());
+        return this;
+    }
+
+    public SuggestionInterval suggestionInterval() {
+        final int index = mValues.getAsInteger(KEY_SUGGESTION_INTERVAL);
+        return suggestionInterval(index);
+    }
+
+    protected SuggestionInterval suggestionInterval(int index) {
+        final SuggestionInterval[] intervals = SuggestionInterval.values();
+        return index < 0 || index >= intervals.length ? SuggestionInterval.NEVER : intervals[index];
     }
 }

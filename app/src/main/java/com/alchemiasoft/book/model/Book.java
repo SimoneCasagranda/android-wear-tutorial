@@ -151,4 +151,11 @@ public class Book {
     public void setOwned(boolean mOwned) {
         this.mOwned = mOwned;
     }
+
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(mTitle).append(" - ").append(mAuthor).append(" (").append(mPages).append(").");
+        return sb.toString();
+    }
 }

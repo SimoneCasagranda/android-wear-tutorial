@@ -16,7 +16,10 @@
 
 package com.alchemiasoft.book.activity;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
@@ -26,6 +29,8 @@ import android.widget.Toast;
 
 import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.fragment.BooksFragment;
+import com.alchemiasoft.book.model.Book;
+import com.alchemiasoft.book.receiver.SuggestionReceiver;
 
 /**
  * Activity that decides weather to display available books or owned books.
@@ -44,6 +49,25 @@ public class HomeActivity extends ActionBarActivity {
      */
     private static final String TAG_ALL_BOOKS = "all_books";
     private static final String TAG_OWNED_BOOKS = "owned_books";
+
+    /**
+     * Key for the book Id.
+     */
+    private static final String KEY_BOOK_ID = "com.alchemiasoft.book.activity.BOOK_ID";
+    private static final long NOT_VALID = -1L;
+
+    /**
+     * Intent that should be used to launch HomeActivity for a given book.
+     *
+     * @param context reference.
+     * @param book    that has to be passed.
+     * @return an intent ready to be used to pass info to the HomeActivity.
+     */
+    public static Intent createFor(@NonNull Context context, @NonNull Book book) {
+        final Intent intent = new Intent(context, HomeActivity.class);
+        intent.putExtra(KEY_BOOK_ID, book.getId());
+        return intent;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +105,27 @@ public class HomeActivity extends ActionBarActivity {
         toolbar.inflateMenu(R.menu.menu_home);
         // Checking if first instance and then attach the first fragment
         if (savedInstanceState == null) {
+            final long bookId = getIntent().getLongExtra(KEY_BOOK_ID, NOT_VALID);
+            if (bookId == NOT_VALID) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.content, BooksFragment.create(this, false), TAG_ALL_BOOKS).commit();
+                // Scheduling a suggestion
+                SuggestionReceiver.scheduleSuggestion(this);
+            } else {
+                // TODO: attach a fragment that shows a single book.
+            }
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        final long bookId = intent.getLongExtra(KEY_BOOK_ID, NOT_VALID);
+        if (bookId == NOT_VALID) {
             getSupportFragmentManager().beginTransaction().replace(R.id.content, BooksFragment.create(this, false), TAG_ALL_BOOKS).commit();
+            // Scheduling a suggestion
+            SuggestionReceiver.scheduleSuggestion(this);
+        } else {
+            // TODO: attach a fragment that shows a single book.
         }
     }
 }
