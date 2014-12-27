@@ -16,7 +16,6 @@
 
 package com.alchemiasoft.book.fragment;
 
-import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
@@ -56,18 +55,6 @@ import java.util.List;
  * Created by Simone Casagranda on 20/12/14.
  */
 public class BooksFragment extends RecyclerViewFragment implements LoaderManager.LoaderCallbacks<Cursor> {
-
-    /**
-     * Interface used to expose the data refresh.
-     */
-    private static interface OnRefreshDataListener {
-
-        /**
-         * Called when the content should be refreshed.
-         */
-        void onRefreshData();
-
-    }
 
     /**
      * Interface that is used to signal when the user selects a book.
@@ -118,23 +105,12 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
     private BooksAdapter mAdapter;
     private StaggeredGridLayoutManager mLayoutManager;
 
-    private final OnRefreshDataListener mOnRefreshDataListener = new OnRefreshDataListener() {
-        @Override
-        public void onRefreshData() {
-            final Activity activity = getActivity();
-            if (activity != null) {
-                // Restarting the loader
-                getLoaderManager().restartLoader(ID_LOADER_BOOKS, getArguments(), BooksFragment.this);
-            }
-        }
-    };
-
     private final OnBookSelectListener mOnBookSelectListener = new OnBookSelectListener() {
         @Override
         public void onBookSelected(@NonNull Book book) {
             final FragmentActivity activity = getActivity();
             if (activity != null) {
-                activity.getSupportFragmentManager().beginTransaction().replace(R.id.content, BookDetailFragment.create(book.getId())).addToBackStack(null).commit();
+                activity.getSupportFragmentManager().beginTransaction().replace(R.id.content, BookDetailFragment.create(book.getId())).commit();
             }
         }
     };
@@ -146,7 +122,6 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
         final RecyclerView recyclerView = getRecyclerView();
         // Set up adapter and recycler view
         mAdapter = new BooksAdapter();
-        mAdapter.setOnRefreshDataListener(mOnRefreshDataListener);
         mAdapter.setOnBookSelectListener(mOnBookSelectListener);
         setRecyclerAdapter(mAdapter);
         mLayoutManager = new StaggeredGridLayoutManager(COLUMN_COUNT, GridLayoutManager.VERTICAL);
@@ -234,7 +209,6 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
          */
         private final List<Book> mBooks = new ArrayList<>();
 
-        private OnRefreshDataListener mOnRefreshDataListener;
         private OnBookSelectListener mOnBookSelectListener;
 
         @Override
@@ -279,10 +253,7 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
                                         final ContentValues cv = new ContentValues();
                                         cv.put(BookDB.Book.OWNED, 1);
                                         final ContentResolver cr = context.getContentResolver();
-                                        if (cr.update(BookDB.Book.create(book.getId()), cv, null, null) > 0 && mOnRefreshDataListener != null) {
-                                            // Refreshing the current data
-                                            mOnRefreshDataListener.onRefreshData();
-                                        }
+                                        cr.update(BookDB.Book.create(book.getId()), cv, null, null);
                                     }
                                     return true;
                                 case R.id.action_sell:
@@ -292,10 +263,7 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
                                         final ContentValues cv = new ContentValues();
                                         cv.put(BookDB.Book.OWNED, 0);
                                         final ContentResolver cr = context.getContentResolver();
-                                        if (cr.update(BookDB.Book.create(book.getId()), cv, null, null) > 0 && mOnRefreshDataListener != null) {
-                                            // Refreshing the current data
-                                            mOnRefreshDataListener.onRefreshData();
-                                        }
+                                        cr.update(BookDB.Book.create(book.getId()), cv, null, null);
                                     }
                                     return true;
                                 default:
@@ -306,10 +274,6 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
                     popup.show();
                 }
             });
-        }
-
-        public void setOnRefreshDataListener(OnRefreshDataListener listener) {
-            this.mOnRefreshDataListener = listener;
         }
 
         public void setOnBookSelectListener(OnBookSelectListener listener) {

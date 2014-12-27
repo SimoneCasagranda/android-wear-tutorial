@@ -16,6 +16,8 @@
 
 package com.alchemiasoft.book.fragment;
 
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -26,6 +28,7 @@ import android.support.v4.content.Loader;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.alchemiasoft.book.R;
@@ -65,6 +68,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
 
     private TextView mTitleTextView, mAuthorTextView, mPagesTextView;
     private TextView mSourceTextView, mDescriptionTextView;
+    private Button mActionButton;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -74,6 +78,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
         mSourceTextView = (TextView) view.findViewById(R.id.source);
         mDescriptionTextView = (TextView) view.findViewById(R.id.description);
         mPagesTextView = (TextView) view.findViewById(R.id.pages);
+        mActionButton = (Button) view.findViewById(R.id.action);
         return view;
     }
 
@@ -104,6 +109,18 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
         mSourceTextView.setText(getString(R.string.source, book.getSource()));
         mDescriptionTextView.setText(book.getDescrition());
         mPagesTextView.setText(getString(R.string.pages, (book.getPages() >= 0 ? book.getPages() : getString(R.string.unknown))));
+        mActionButton.setText(book.isOwned() ? R.string.action_sell : R.string.action_buy);
+        mActionButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mActionButton.setEnabled(false);
+                final ContentValues cv = new ContentValues();
+                cv.put(BookDB.Book.OWNED, book.isOwned() ? 0 : 1);
+                final ContentResolver cr = getActivity().getContentResolver();
+                cr.update(BookDB.Book.create(book.getId()), cv, null, null);
+            }
+        });
+        mActionButton.setEnabled(true);
     }
 
     @Override
