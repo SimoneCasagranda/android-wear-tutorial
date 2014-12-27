@@ -20,9 +20,13 @@ import android.app.Activity;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.PopupMenu;
@@ -39,7 +43,6 @@ import android.widget.Toast;
 import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.content.BookDB;
 import com.alchemiasoft.book.fragment.base.RecyclerViewFragment;
-import com.alchemiasoft.book.loader.BooksLoader;
 import com.alchemiasoft.book.model.Book;
 import com.alchemiasoft.book.util.ViewUtil;
 import com.alchemiasoft.book.widget.SmartSwipeRefreshLayout;
@@ -52,7 +55,7 @@ import java.util.List;
  * <p/>
  * Created by Simone Casagranda on 20/12/14.
  */
-public class BooksFragment extends RecyclerViewFragment implements LoaderManager.LoaderCallbacks<List<Book>> {
+public class BooksFragment extends RecyclerViewFragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
      * Interface used to expose the data refresh.
@@ -62,8 +65,21 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
         /**
          * Called when the content should be refreshed.
          */
-        public void onRefreshData();
+        void onRefreshData();
 
+    }
+
+    /**
+     * Interface that is used to signal when the user selects a book.
+     */
+    private static interface OnBookSelectListener {
+
+        /**
+         * Called when a book is selected.
+         *
+         * @param book that has been selected.
+         */
+        void onBookSelected(@NonNull Book book);
     }
 
     /**
@@ -80,6 +96,9 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
      * Id used for the book(s) loader.
      */
     private static final int ID_LOADER_BOOKS = 23;
+
+    private static final String SELECTION = BookDB.Book.OWNED + " = ?";
+    private static final String[] SELECT_OWNED = {String.valueOf(1)};
 
     /**
      * Creates a new instance of BookListFragment.
@@ -110,6 +129,16 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
         }
     };
 
+    private final OnBookSelectListener mOnBookSelectListener = new OnBookSelectListener() {
+        @Override
+        public void onBookSelected(@NonNull Book book) {
+            final FragmentActivity activity = getActivity();
+            if (activity != null) {
+                activity.getSupportFragmentManager().beginTransaction().replace(R.id.content, BookDetailFragment.create(book.getId())).addToBackStack(null).commit();
+            }
+        }
+    };
+
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -118,6 +147,7 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
         // Set up adapter and recycler view
         mAdapter = new BooksAdapter();
         mAdapter.setOnRefreshDataListener(mOnRefreshDataListener);
+        mAdapter.setOnBookSelectListener(mOnBookSelectListener);
         setRecyclerAdapter(mAdapter);
         mLayoutManager = new StaggeredGridLayoutManager(COLUMN_COUNT, GridLayoutManager.VERTICAL);
         recyclerView.setLayoutManager(mLayoutManager);
@@ -145,18 +175,24 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
     }
 
     @Override
-    public Loader<List<Book>> onCreateLoader(int id, Bundle args) {
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case ID_LOADER_BOOKS:
-                return new BooksLoader(getActivity(), args.getBoolean(KEY_OWNED));
+                final boolean owned = args.getBoolean(KEY_OWNED);
+                if (owned) {
+                    return new CursorLoader(getActivity(), BookDB.Book.CONTENT_URI, null, SELECTION, SELECT_OWNED, null);
+                } else {
+                    return new CursorLoader(getActivity(), BookDB.Book.CONTENT_URI, null, null, null, null);
+                }
             default:
                 throw new IllegalArgumentException("loader id=" + id + " is not supported!");
         }
     }
 
     @Override
-    public void onLoadFinished(Loader<List<Book>> loader, List<Book> data) {
-        mAdapter.swap(data);
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        final List<Book> books = Book.allFrom(data);
+        mAdapter.swap(books);
         if (isResumed()) {
             setContentShown(true);
         } else {
@@ -165,7 +201,7 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Book>> loader) {
+    public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swap(null);
     }
 
@@ -199,6 +235,7 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
         private final List<Book> mBooks = new ArrayList<>();
 
         private OnRefreshDataListener mOnRefreshDataListener;
+        private OnBookSelectListener mOnBookSelectListener;
 
         @Override
         public BookHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
@@ -216,6 +253,14 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
             } else {
                 ViewUtil.setBackground(bookHolder.mOwnedView, null);
             }
+            bookHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (mOnBookSelectListener != null) {
+                        mOnBookSelectListener.onBookSelected(book);
+                    }
+                }
+            });
             bookHolder.mOverflowView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(final View v) {
@@ -265,6 +310,10 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
 
         public void setOnRefreshDataListener(OnRefreshDataListener listener) {
             this.mOnRefreshDataListener = listener;
+        }
+
+        public void setOnBookSelectListener(OnBookSelectListener listener) {
+            this.mOnBookSelectListener = listener;
         }
 
         @Override

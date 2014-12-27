@@ -41,19 +41,12 @@ public class Book {
 
     private String mTitle;
     private String mAuthor;
+    private String mSource;
+    private String mDescrition;
     private int mPages;
     private boolean mOwned;
 
     private Book() {
-    }
-
-    public static Book create(String title, String author, int pages, boolean owned) {
-        final Book book = new Book();
-        book.mTitle = title;
-        book.mAuthor = author;
-        book.mPages = pages;
-        book.mOwned = owned;
-        return book;
     }
 
     public static Book oneFrom(@NonNull Cursor c) {
@@ -67,6 +60,12 @@ public class Book {
         }
         if ((index = c.getColumnIndex(BookDB.Book.AUTHOR)) > -1) {
             book.mAuthor = c.getString(index);
+        }
+        if ((index = c.getColumnIndex(BookDB.Book.SOURCE)) > -1) {
+            book.mSource = c.getString(index);
+        }
+        if ((index = c.getColumnIndex(BookDB.Book.DESCRIPTION)) > -1) {
+            book.mDescrition = c.getString(index);
         }
         if ((index = c.getColumnIndex(BookDB.Book.PAGES)) > -1) {
             book.mPages = c.getInt(index);
@@ -90,6 +89,8 @@ public class Book {
         final Book book = new Book();
         book.mTitle = json.optString("title");
         book.mAuthor = json.optString("author");
+        book.mSource = json.optString("source");
+        book.mDescrition = json.optString("description");
         book.mPages = json.optInt("pages");
         return book;
     }
@@ -107,6 +108,8 @@ public class Book {
         final ContentValues cv = new ContentValues();
         cv.put(BookDB.Book.TITLE, mTitle);
         cv.put(BookDB.Book.AUTHOR, mAuthor);
+        cv.put(BookDB.Book.SOURCE, mSource);
+        cv.put(BookDB.Book.DESCRIPTION, mDescrition);
         cv.put(BookDB.Book.PAGES, mPages);
         cv.put(BookDB.Book.OWNED, mOwned);
         return cv;
@@ -122,6 +125,14 @@ public class Book {
 
     public String getAuthor() {
         return mAuthor;
+    }
+
+    public String getSource() {
+        return mSource;
+    }
+
+    public String getDescrition() {
+        return mDescrition;
     }
 
     public int getPages() {
@@ -142,6 +153,14 @@ public class Book {
 
     public void setAuthor(String mAuthor) {
         this.mAuthor = mAuthor;
+    }
+
+    public void setSource(String source) {
+        this.mSource = source;
+    }
+
+    public void setDescrition(String description) {
+        this.mDescrition = description;
     }
 
     public void setPages(int mPages) {

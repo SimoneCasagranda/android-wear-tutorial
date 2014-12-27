@@ -65,7 +65,7 @@ public class SuggestionService extends IntentService {
         // Showing a notification if a not owned book is found
         if (book != null) {
             Log.d(TAG_LOG, "Found book that can be suggested: " + book);
-            final String content = getString(R.string.content_book_suggestion, book.getTitle(), book.getAuthor());
+            final String content = getString(R.string.content_book_suggestion, book.getTitle(), book.getAuthor(), book.getDescrition());
             final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
             builder.setSmallIcon(R.drawable.ic_launcher).setAutoCancel(true).setContentTitle(getString(R.string.title_book_suggestion)).setContentText(content);
             builder.setStyle(new NotificationCompat.BigTextStyle().bigText(content));

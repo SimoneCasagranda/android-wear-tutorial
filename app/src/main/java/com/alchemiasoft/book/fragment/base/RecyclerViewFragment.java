@@ -47,7 +47,7 @@ public class RecyclerViewFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final View view = getActivity().getLayoutInflater().inflate(R.layout.recycler_content, container, false);
+        final View view = inflater.inflate(R.layout.recycler_content, container, false);
         mSwipeRefreshLayout = (SmartSwipeRefreshLayout) view.findViewById(R.id.swipe_refresh_layout);
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mEmptyTextView = (TextView) view.findViewById(R.id.empty_text);

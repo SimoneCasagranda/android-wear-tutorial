@@ -28,6 +28,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.alchemiasoft.book.R;
+import com.alchemiasoft.book.fragment.BookDetailFragment;
 import com.alchemiasoft.book.fragment.BooksFragment;
 import com.alchemiasoft.book.model.Book;
 import com.alchemiasoft.book.receiver.SuggestionReceiver;
@@ -105,27 +106,23 @@ public class HomeActivity extends ActionBarActivity {
         toolbar.inflateMenu(R.menu.menu_home);
         // Checking if first instance and then attach the first fragment
         if (savedInstanceState == null) {
-            final long bookId = getIntent().getLongExtra(KEY_BOOK_ID, NOT_VALID);
-            if (bookId == NOT_VALID) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.content, BooksFragment.create(this, false), TAG_ALL_BOOKS).commit();
-                // Scheduling a suggestion
-                SuggestionReceiver.scheduleSuggestion(this);
-            } else {
-                // TODO: attach a fragment that shows a single book.
-            }
+            attachBookFragment(getIntent().getLongExtra(KEY_BOOK_ID, NOT_VALID));
         }
     }
 
     @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
-        final long bookId = intent.getLongExtra(KEY_BOOK_ID, NOT_VALID);
+        attachBookFragment(intent.getLongExtra(KEY_BOOK_ID, NOT_VALID));
+    }
+
+    private void attachBookFragment(final long bookId) {
         if (bookId == NOT_VALID) {
             getSupportFragmentManager().beginTransaction().replace(R.id.content, BooksFragment.create(this, false), TAG_ALL_BOOKS).commit();
             // Scheduling a suggestion
             SuggestionReceiver.scheduleSuggestion(this);
         } else {
-            // TODO: attach a fragment that shows a single book.
+            getSupportFragmentManager().beginTransaction().replace(R.id.content, BookDetailFragment.create(bookId)).commit();
         }
     }
 }
