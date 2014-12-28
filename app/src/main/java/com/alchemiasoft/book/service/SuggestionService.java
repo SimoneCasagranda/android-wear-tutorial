@@ -74,7 +74,7 @@ public class SuggestionService extends IntentService {
             // ONLY 4 WEARABLE(s)
             final NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender();
             // ACTION TO PURCHASE A BOOK FROM A WEARABLE
-            final PendingIntent purchaseIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.buy(this, book).notificationId(ID_SUGGESTION).build(), PendingIntent.FLAG_UPDATE_CURRENT);
+            final PendingIntent purchaseIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.buy(this, book).notificationId(ID_SUGGESTION).wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
             wearableExtender.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_action_buy, getString(R.string.action_buy), purchaseIntent).build());
             // Finally extending the notification
             builder.extend(wearableExtender);

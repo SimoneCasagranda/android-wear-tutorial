@@ -53,6 +53,7 @@ public class PurchaseService extends IntentService {
     private static final String KEY_BOOK_ID = "com.alchemiasoft.book.service.BOOK_ID";
     private static final String KEY_ACTION = "com.alchemiasoft.book.service.ACTION";
     private static final String KEY_NOTIFICATION_ID = "com.alchemiasoft.book.service.NOTIFICATION_ID";
+    private static final String KEY_WEARABLE_INPUT = "com.alchemiasoft.book.service.WEARABLE_INPUT";
 
     /**
      * Not valid id for book.
@@ -94,6 +95,11 @@ public class PurchaseService extends IntentService {
             return this;
         }
 
+        public IntentBuilder wearableInput() {
+            mIntent.putExtra(KEY_WEARABLE_INPUT, true);
+            return this;
+        }
+
         public Intent build() {
             return mIntent;
         }
@@ -120,7 +126,7 @@ public class PurchaseService extends IntentService {
             switch (action) {
                 case BUY:
                     cv.put(BookDB.Book.OWNED, 1);
-                    if (cr.update(BookDB.Book.create(bookId), cv, null, null) == 1) {
+                    if (cr.update(BookDB.Book.create(bookId), cv, null, null) == 1 && intent.getBooleanExtra(KEY_WEARABLE_INPUT, false)) {
                         final Book book = getBook(bookId);
                         if (book != null) {
                             final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
@@ -130,7 +136,7 @@ public class PurchaseService extends IntentService {
                             // ONLY 4 WEARABLE(s)
                             final NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender();
                             // ACTION TO SELL A BOOK FROM A WEARABLE
-                            final PendingIntent sellIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.sell(this, book).notificationId(NOTIFICATION_ID).build(), PendingIntent.FLAG_UPDATE_CURRENT);
+                            final PendingIntent sellIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.sell(this, book).notificationId(NOTIFICATION_ID).wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
                             wearableExtender.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_action_sell, getString(R.string.action_sell), sellIntent).build());
                             // Finally extending the notification
                             builder.extend(wearableExtender);
@@ -141,7 +147,7 @@ public class PurchaseService extends IntentService {
                     break;
                 case SELL:
                     cv.put(BookDB.Book.OWNED, 0);
-                    if (cr.update(BookDB.Book.create(bookId), cv, null, null) == 1) {
+                    if (cr.update(BookDB.Book.create(bookId), cv, null, null) == 1 && intent.getBooleanExtra(KEY_WEARABLE_INPUT, false)) {
                         final Book book = getBook(bookId);
                         if (book != null) {
                             final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
