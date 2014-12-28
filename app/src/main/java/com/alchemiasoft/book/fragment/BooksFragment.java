@@ -16,8 +16,6 @@
 
 package com.alchemiasoft.book.fragment;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -43,6 +41,7 @@ import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.content.BookDB;
 import com.alchemiasoft.book.fragment.base.RecyclerViewFragment;
 import com.alchemiasoft.book.model.Book;
+import com.alchemiasoft.book.service.PurchaseService;
 import com.alchemiasoft.book.util.ViewUtil;
 import com.alchemiasoft.book.widget.SmartSwipeRefreshLayout;
 
@@ -250,20 +249,14 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
                                     if (book.isOwned()) {
                                         Toast.makeText(context, context.getString(R.string.book_already_owned), Toast.LENGTH_SHORT).show();
                                     } else {
-                                        final ContentValues cv = new ContentValues();
-                                        cv.put(BookDB.Book.OWNED, 1);
-                                        final ContentResolver cr = context.getContentResolver();
-                                        cr.update(BookDB.Book.create(book.getId()), cv, null, null);
+                                        context.startService(PurchaseService.IntentBuilder.buy(context, book).build());
                                     }
                                     return true;
                                 case R.id.action_sell:
                                     if (!book.isOwned()) {
                                         Toast.makeText(context, context.getString(R.string.book_not_owned), Toast.LENGTH_SHORT).show();
                                     } else {
-                                        final ContentValues cv = new ContentValues();
-                                        cv.put(BookDB.Book.OWNED, 0);
-                                        final ContentResolver cr = context.getContentResolver();
-                                        cr.update(BookDB.Book.create(book.getId()), cv, null, null);
+                                        context.startService(PurchaseService.IntentBuilder.sell(context, book).build());
                                     }
                                     return true;
                                 default:

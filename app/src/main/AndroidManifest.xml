@@ -57,6 +57,10 @@
             android:name=".service.SuggestionService"
             android:exported="false" />
 
+        <service
+            android:name=".service.PurchaseService"
+            android:exported="false" />
+
         <provider
             android:authorities="com.alchemiasoft.book.provider"
             android:name=".content.BookContentProvider"

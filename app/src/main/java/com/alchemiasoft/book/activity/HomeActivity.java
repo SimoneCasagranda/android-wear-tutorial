@@ -97,6 +97,10 @@ public class HomeActivity extends ActionBarActivity {
                     case R.id.action_settings:
                         Toast.makeText(HomeActivity.this, getString(R.string.not_implemented), Toast.LENGTH_SHORT).show();
                         return true;
+                    case R.id.action_suggestion:
+                        // Scheduling a suggestion
+                        SuggestionReceiver.scheduleSuggestion(HomeActivity.this);
+                        return true;
                     default:
                         Log.w(TAG_LOG, "MenuItem: title=" + menuItem.getTitle() + " & itemId=" + menuItem.getItemId() + " is not handled.");
                         return false;

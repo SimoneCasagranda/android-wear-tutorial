@@ -70,6 +70,16 @@ public class SuggestionService extends IntentService {
             builder.setSmallIcon(R.drawable.ic_launcher).setAutoCancel(true).setContentTitle(getString(R.string.title_book_suggestion)).setContentText(content);
             builder.setStyle(new NotificationCompat.BigTextStyle().bigText(content));
             builder.setContentIntent(PendingIntent.getActivity(this, 0, HomeActivity.createFor(this, book), PendingIntent.FLAG_UPDATE_CURRENT));
+
+            // ONLY 4 WEARABLE(s)
+            final NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender();
+            // ACTION TO PURCHASE A BOOK FROM A WEARABLE
+            final PendingIntent purchaseIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.buy(this, book).notificationId(ID_SUGGESTION).build(), PendingIntent.FLAG_UPDATE_CURRENT);
+            wearableExtender.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_action_buy, getString(R.string.action_buy), purchaseIntent).build());
+            // Finally extending the notification
+            builder.extend(wearableExtender);
+
+            // Sending the notification
             NotificationManagerCompat.from(this).notify(ID_SUGGESTION, builder.build());
         }
         // Completing the Wakeful Intent
