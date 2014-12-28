@@ -36,7 +36,7 @@
     <string name="unknown">Unknown</string>
     <string name="source">Source: %1$s</string>
     <string name="action_suggestion">Suggest book</string>
-    <string name="book_sold">Book sold.</string>
-    <string name="book_purchased">Book purchased.</string>
+    <string name="book_sold">Book sold</string>
+    <string name="book_purchased">Book purchased</string>
 
 </resources>
