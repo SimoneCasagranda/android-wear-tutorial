@@ -65,7 +65,7 @@ public class SuggestionService extends IntentService {
         // Showing a notification if a not owned book is found
         if (book != null) {
             Log.d(TAG_LOG, "Found book that can be suggested: " + book);
-            final String content = getString(R.string.content_book_suggestion, book.getTitle(), book.getAuthor(), book.getDescrition());
+            final String content = getString(R.string.content_book_suggestion, book.getTitle(), book.getAuthor());
             final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
             builder.setSmallIcon(R.drawable.ic_launcher).setAutoCancel(true).setContentTitle(getString(R.string.title_book_suggestion)).setContentText(content);
             builder.setStyle(new NotificationCompat.BigTextStyle().bigText(content));
@@ -73,8 +73,12 @@ public class SuggestionService extends IntentService {
 
             // ONLY 4 WEARABLE(s)
             final NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender();
+            // SECOND PAGE WITH BOOK DESCRIPTION
+            wearableExtender.addPage(new NotificationCompat.Builder(this).setContentTitle(getString(R.string.description))
+                    .setStyle(new NotificationCompat.BigTextStyle().bigText(book.getDescrition())).build());
             // ACTION TO PURCHASE A BOOK FROM A WEARABLE
-            final PendingIntent purchaseIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.buy(this, book).notificationId(ID_SUGGESTION).wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
+            final PendingIntent purchaseIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.buy(this, book).notificationId(ID_SUGGESTION)
+                    .wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
             wearableExtender.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_action_buy, getString(R.string.action_buy), purchaseIntent).build());
             // Finally extending the notification
             builder.extend(wearableExtender);
