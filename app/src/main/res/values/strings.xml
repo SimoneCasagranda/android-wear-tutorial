@@ -31,12 +31,13 @@
     <string name="action_sell">Sell</string>
 
     <string name="title_book_suggestion">Book suggestion</string>
-    <string name="content_book_suggestion">Looking at your library you might be interested in reading:\n\n%1$s by %2$s\n\n%3$s</string>
+    <string name="content_book_suggestion">Looking at your library you might be interested in reading:\n\n%1$s by %2$s</string>
     <string name="pages">Pages: %1$s</string>
     <string name="unknown">Unknown</string>
     <string name="source">Source: %1$s</string>
     <string name="action_suggestion">Suggest book</string>
     <string name="book_sold">Book sold</string>
     <string name="book_purchased">Book purchased</string>
+    <string name="description">Description</string>
 
 </resources>
