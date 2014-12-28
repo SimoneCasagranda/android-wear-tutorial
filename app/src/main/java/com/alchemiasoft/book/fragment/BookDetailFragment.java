@@ -16,8 +16,7 @@
 
 package com.alchemiasoft.book.fragment;
 
-import android.content.ContentResolver;
-import android.content.ContentValues;
+import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -34,6 +33,7 @@ import android.widget.TextView;
 import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.content.BookDB;
 import com.alchemiasoft.book.model.Book;
+import com.alchemiasoft.book.service.PurchaseService;
 
 /**
  * Fragment that shows a book in full details.
@@ -114,10 +114,9 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
             @Override
             public void onClick(View v) {
                 mActionButton.setEnabled(false);
-                final ContentValues cv = new ContentValues();
-                cv.put(BookDB.Book.OWNED, book.isOwned() ? 0 : 1);
-                final ContentResolver cr = getActivity().getContentResolver();
-                cr.update(BookDB.Book.create(book.getId()), cv, null, null);
+                final Activity activity = getActivity();
+                final PurchaseService.IntentBuilder builder = book.isOwned() ? PurchaseService.IntentBuilder.sell(activity, book) : PurchaseService.IntentBuilder.buy(activity, book);
+                activity.startService(builder.build());
             }
         });
         mActionButton.setEnabled(true);
