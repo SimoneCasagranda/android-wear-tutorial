@@ -21,6 +21,7 @@ import android.app.PendingIntent;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 import android.util.Log;
@@ -79,6 +80,7 @@ public class SuggestionService extends IntentService {
             // ACTION TO PURCHASE A BOOK FROM A WEARABLE
             final PendingIntent purchaseIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.buy(this, book).notificationId(ID_SUGGESTION)
                     .wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
+            wearableExtender.setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.background));
             wearableExtender.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_action_buy, getString(R.string.action_buy), purchaseIntent).build());
             // Finally extending the notification
             builder.extend(wearableExtender);

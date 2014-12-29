@@ -23,6 +23,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
@@ -135,6 +136,7 @@ public class PurchaseService extends IntentService {
 
                             // ONLY 4 WEARABLE(s)
                             final NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender();
+                            wearableExtender.setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.background));
                             // ACTION TO SELL A BOOK FROM A WEARABLE
                             final PendingIntent sellIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.sell(this, book).notificationId(NOTIFICATION_ID).wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
                             wearableExtender.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_action_sell, getString(R.string.action_sell), sellIntent).build());
