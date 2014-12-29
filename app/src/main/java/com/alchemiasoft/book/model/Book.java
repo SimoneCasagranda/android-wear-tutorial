@@ -42,8 +42,9 @@ public class Book {
     private String mTitle;
     private String mAuthor;
     private String mSource;
-    private String mDescrition;
+    private String mDescription;
     private int mPages;
+    private String mNotes;
     private boolean mOwned;
 
     private Book() {
@@ -65,10 +66,13 @@ public class Book {
             book.mSource = c.getString(index);
         }
         if ((index = c.getColumnIndex(BookDB.Book.DESCRIPTION)) > -1) {
-            book.mDescrition = c.getString(index);
+            book.mDescription = c.getString(index);
         }
         if ((index = c.getColumnIndex(BookDB.Book.PAGES)) > -1) {
             book.mPages = c.getInt(index);
+        }
+        if ((index = c.getColumnIndex(BookDB.Book.NOTES)) > -1) {
+            book.mNotes = c.getString(index);
         }
         if ((index = c.getColumnIndex(BookDB.Book.OWNED)) > -1) {
             book.mOwned = c.getInt(index) == 1 ? true : false;
@@ -90,7 +94,7 @@ public class Book {
         book.mTitle = json.optString("title");
         book.mAuthor = json.optString("author");
         book.mSource = json.optString("source");
-        book.mDescrition = json.optString("description");
+        book.mDescription = json.optString("description");
         book.mPages = json.optInt("pages");
         return book;
     }
@@ -109,8 +113,9 @@ public class Book {
         cv.put(BookDB.Book.TITLE, mTitle);
         cv.put(BookDB.Book.AUTHOR, mAuthor);
         cv.put(BookDB.Book.SOURCE, mSource);
-        cv.put(BookDB.Book.DESCRIPTION, mDescrition);
+        cv.put(BookDB.Book.DESCRIPTION, mDescription);
         cv.put(BookDB.Book.PAGES, mPages);
+        cv.put(BookDB.Book.NOTES, mNotes);
         cv.put(BookDB.Book.OWNED, mOwned);
         return cv;
     }
@@ -132,7 +137,7 @@ public class Book {
     }
 
     public String getDescrition() {
-        return mDescrition;
+        return mDescription;
     }
 
     public int getPages() {
@@ -141,6 +146,10 @@ public class Book {
 
     public boolean isOwned() {
         return mOwned;
+    }
+
+    public String getNotes() {
+        return mNotes;
     }
 
     public void setId(long mId) {
@@ -160,7 +169,7 @@ public class Book {
     }
 
     public void setDescrition(String description) {
-        this.mDescrition = description;
+        this.mDescription = description;
     }
 
     public void setPages(int mPages) {
@@ -169,6 +178,10 @@ public class Book {
 
     public void setOwned(boolean mOwned) {
         this.mOwned = mOwned;
+    }
+
+    public void setNotes(String notes) {
+        this.mNotes = notes;
     }
 
     @Override

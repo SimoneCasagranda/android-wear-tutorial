@@ -24,6 +24,7 @@ import android.database.Cursor;
 import android.graphics.BitmapFactory;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.RemoteInput;
 import android.util.Log;
 
 import com.alchemiasoft.book.R;
@@ -77,11 +78,17 @@ public class SuggestionService extends IntentService {
             // SECOND PAGE WITH BOOK DESCRIPTION
             wearableExtender.addPage(new NotificationCompat.Builder(this).setContentTitle(getString(R.string.description))
                     .setStyle(new NotificationCompat.BigTextStyle().bigText(book.getDescrition())).build());
-            // ACTION TO PURCHASE A BOOK FROM A WEARABLE
-            final PendingIntent purchaseIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.buy(this, book).notificationId(ID_SUGGESTION)
-                    .wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
             wearableExtender.setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.background));
+            // ACTION TO PURCHASE A BOOK FROM A WEARABLE
+            final PendingIntent purchaseIntent = PendingIntent.getService(this, 0, BookActionService.IntentBuilder.buy(this, book).notificationId(ID_SUGGESTION)
+                    .wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
             wearableExtender.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_action_buy, getString(R.string.action_buy), purchaseIntent).build());
+            // ACTION TO ADD NOTES VIA VOICE REPLY
+            final RemoteInput input = BookActionService.RemoteInputBuilder.create(this).options(R.array.note_options).build();
+            final PendingIntent notesIntent = PendingIntent.getService(this, 0, BookActionService.IntentBuilder.addNote(this, book).notificationId(ID_SUGGESTION)
+                    .wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
+            wearableExtender.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_action_notes, getString(R.string.action_notes), notesIntent)
+                    .addRemoteInput(input).build());
             // Finally extending the notification
             builder.extend(wearableExtender);
 

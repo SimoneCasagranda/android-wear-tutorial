@@ -39,5 +39,8 @@
     <string name="book_sold">Book sold</string>
     <string name="book_purchased">Book purchased</string>
     <string name="description">Description</string>
+    <string name="action_notes">Notes</string>
+    <string name="add_notes">Add a note</string>
+    <string name="my_notes">My notes</string>
 
 </resources>

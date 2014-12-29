@@ -33,7 +33,7 @@ import android.widget.TextView;
 import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.content.BookDB;
 import com.alchemiasoft.book.model.Book;
-import com.alchemiasoft.book.service.PurchaseService;
+import com.alchemiasoft.book.service.BookActionService;
 
 /**
  * Fragment that shows a book in full details.
@@ -67,7 +67,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
     }
 
     private TextView mTitleTextView, mAuthorTextView, mPagesTextView;
-    private TextView mSourceTextView, mDescriptionTextView;
+    private TextView mSourceTextView, mDescriptionTextView, mNotesTextView;
     private Button mActionButton;
 
     @Override
@@ -78,6 +78,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
         mSourceTextView = (TextView) view.findViewById(R.id.source);
         mDescriptionTextView = (TextView) view.findViewById(R.id.description);
         mPagesTextView = (TextView) view.findViewById(R.id.pages);
+        mNotesTextView = (TextView) view.findViewById(R.id.notes);
         mActionButton = (Button) view.findViewById(R.id.action);
         return view;
     }
@@ -114,6 +115,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
         mAuthorTextView.setText(book.getAuthor());
         mSourceTextView.setText(getString(R.string.source, book.getSource()));
         mDescriptionTextView.setText(book.getDescrition());
+        mNotesTextView.setText(book.getNotes());
         mPagesTextView.setText(getString(R.string.pages, (book.getPages() >= 0 ? book.getPages() : getString(R.string.unknown))));
         mActionButton.setText(book.isOwned() ? R.string.action_sell : R.string.action_buy);
         mActionButton.setOnClickListener(new View.OnClickListener() {
@@ -121,7 +123,7 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
             public void onClick(View v) {
                 mActionButton.setEnabled(false);
                 final Activity activity = getActivity();
-                final PurchaseService.IntentBuilder builder = book.isOwned() ? PurchaseService.IntentBuilder.sell(activity, book) : PurchaseService.IntentBuilder.buy(activity, book);
+                final BookActionService.IntentBuilder builder = book.isOwned() ? BookActionService.IntentBuilder.sell(activity, book) : BookActionService.IntentBuilder.buy(activity, book);
                 activity.startService(builder.build());
             }
         });
