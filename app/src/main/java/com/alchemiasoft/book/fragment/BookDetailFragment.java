@@ -83,9 +83,15 @@ public class BookDetailFragment extends Fragment implements LoaderManager.Loader
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onResume() {
+        super.onResume();
         getLoaderManager().initLoader(ID_LOADER_BOOK, getArguments(), this);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getLoaderManager().destroyLoader(ID_LOADER_BOOK);
     }
 
     @Override
