@@ -58,7 +58,7 @@
             android:exported="false" />
 
         <service
-            android:name=".service.PurchaseService"
+            android:name=".service.BookActionService"
             android:exported="false" />
 
         <provider

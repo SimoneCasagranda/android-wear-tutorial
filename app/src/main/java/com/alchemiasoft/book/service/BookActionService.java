@@ -16,6 +16,7 @@
 
 package com.alchemiasoft.book.service;
 
+import android.annotation.TargetApi;
 import android.app.IntentService;
 import android.app.PendingIntent;
 import android.content.ContentResolver;
@@ -24,9 +25,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.app.RemoteInput;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.alchemiasoft.book.R;
@@ -39,22 +44,23 @@ import com.alchemiasoft.book.model.Book;
  * <p/>
  * Created by Simone Casagranda on 28/12/14.
  */
-public class PurchaseService extends IntentService {
+public class BookActionService extends IntentService {
 
     /**
      * Tag used for logging purposes.
      */
-    private static final String TAG_LOG = PurchaseService.class.getSimpleName();
+    private static final String TAG_LOG = BookActionService.class.getSimpleName();
 
     private static final int NOTIFICATION_ID = 37;
 
     /**
      * Available params.
      */
-    private static final String KEY_BOOK_ID = "com.alchemiasoft.book.service.BOOK_ID";
-    private static final String KEY_ACTION = "com.alchemiasoft.book.service.ACTION";
-    private static final String KEY_NOTIFICATION_ID = "com.alchemiasoft.book.service.NOTIFICATION_ID";
-    private static final String KEY_WEARABLE_INPUT = "com.alchemiasoft.book.service.WEARABLE_INPUT";
+    private static final String EXTRA_BOOK_ID = "com.alchemiasoft.book.service.BOOK_ID";
+    private static final String EXTRA_ACTION = "com.alchemiasoft.book.service.ACTION";
+    private static final String EXTRA_NOTIFICATION_ID = "com.alchemiasoft.book.service.NOTIFICATION_ID";
+    private static final String EXTRA_WEARABLE_INPUT = "com.alchemiasoft.book.service.WEARABLE_INPUT";
+    private static final String EXTRA_ADD_NOTE = "com.alchemiasoft.book.service.ADD_NOTE";
 
     /**
      * Not valid id for book.
@@ -70,7 +76,7 @@ public class PurchaseService extends IntentService {
      * Available actions.
      */
     private static enum Action {
-        BUY, SELL
+        BUY, SELL, ADD_NOTE
     }
 
     public static final class IntentBuilder {
@@ -78,9 +84,9 @@ public class PurchaseService extends IntentService {
         private final Intent mIntent;
 
         private IntentBuilder(Context context, Book book, Action action) {
-            mIntent = new Intent(context, PurchaseService.class);
-            mIntent.putExtra(KEY_BOOK_ID, book.getId());
-            mIntent.putExtra(KEY_ACTION, action.ordinal());
+            mIntent = new Intent(context, BookActionService.class);
+            mIntent.putExtra(EXTRA_BOOK_ID, book.getId());
+            mIntent.putExtra(EXTRA_ACTION, action.ordinal());
         }
 
         public static IntentBuilder buy(@NonNull Context context, @NonNull Book book) {
@@ -91,13 +97,17 @@ public class PurchaseService extends IntentService {
             return new IntentBuilder(context, book, Action.SELL);
         }
 
+        public static IntentBuilder addNote(@NonNull Context context, @NonNull Book book) {
+            return new IntentBuilder(context, book, Action.ADD_NOTE);
+        }
+
         public IntentBuilder notificationId(int id) {
-            mIntent.putExtra(KEY_NOTIFICATION_ID, id);
+            mIntent.putExtra(EXTRA_NOTIFICATION_ID, id);
             return this;
         }
 
         public IntentBuilder wearableInput() {
-            mIntent.putExtra(KEY_WEARABLE_INPUT, true);
+            mIntent.putExtra(EXTRA_WEARABLE_INPUT, true);
             return this;
         }
 
@@ -106,28 +116,53 @@ public class PurchaseService extends IntentService {
         }
     }
 
-    public PurchaseService() {
+    public static final class RemoteInputBuilder {
+
+        private final Context mContext;
+        private final RemoteInput.Builder mBuilder;
+
+        private RemoteInputBuilder(@NonNull Context context, @NonNull String label) {
+            mContext = context.getApplicationContext();
+            mBuilder = new RemoteInput.Builder(EXTRA_ADD_NOTE).setLabel(label);
+        }
+
+        public static RemoteInputBuilder create(Context context) {
+            return new RemoteInputBuilder(context, context.getString(R.string.add_notes));
+        }
+
+        public RemoteInputBuilder options(int options) {
+            mBuilder.setChoices(mContext.getResources().getStringArray(options));
+            return this;
+        }
+
+        public RemoteInput build() {
+            return mBuilder.build();
+        }
+
+    }
+
+    public BookActionService() {
         super(TAG_LOG);
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        final int notificationId = intent.getIntExtra(KEY_NOTIFICATION_ID, NOT_VALID_NOTIFICATION);
+        final int notificationId = intent.getIntExtra(EXTRA_NOTIFICATION_ID, NOT_VALID_NOTIFICATION);
         // Cancelling any shown notification
         if (notificationId != NOT_VALID_NOTIFICATION) {
             Log.d(TAG_LOG, "Dismissing notification with id=" + notificationId);
             NotificationManagerCompat.from(this).cancel(notificationId);
         }
-        final long bookId = intent.getLongExtra(KEY_BOOK_ID, NOT_VALID_BOOK);
+        final long bookId = intent.getLongExtra(EXTRA_BOOK_ID, NOT_VALID_BOOK);
         if (bookId != NOT_VALID_BOOK) {
             final ContentResolver cr = getContentResolver();
-            final Action action = Action.values()[intent.getIntExtra(KEY_ACTION, 0)];
+            final Action action = Action.values()[intent.getIntExtra(EXTRA_ACTION, 0)];
             Log.d(TAG_LOG, "Performing action=" + action + " on book with id=" + bookId);
             final ContentValues cv = new ContentValues();
             switch (action) {
                 case BUY:
                     cv.put(BookDB.Book.OWNED, 1);
-                    if (cr.update(BookDB.Book.create(bookId), cv, null, null) == 1 && intent.getBooleanExtra(KEY_WEARABLE_INPUT, false)) {
+                    if (cr.update(BookDB.Book.create(bookId), cv, null, null) == 1 && intent.getBooleanExtra(EXTRA_WEARABLE_INPUT, false)) {
                         final Book book = getBook(bookId);
                         if (book != null) {
                             final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
@@ -138,7 +173,7 @@ public class PurchaseService extends IntentService {
                             final NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender();
                             wearableExtender.setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.background));
                             // ACTION TO SELL A BOOK FROM A WEARABLE
-                            final PendingIntent sellIntent = PendingIntent.getService(this, 0, PurchaseService.IntentBuilder.sell(this, book).notificationId(NOTIFICATION_ID).wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
+                            final PendingIntent sellIntent = PendingIntent.getService(this, 0, BookActionService.IntentBuilder.sell(this, book).notificationId(NOTIFICATION_ID).wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
                             wearableExtender.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_action_sell, getString(R.string.action_sell), sellIntent).build());
                             // Finally extending the notification
                             builder.extend(wearableExtender);
@@ -149,7 +184,7 @@ public class PurchaseService extends IntentService {
                     break;
                 case SELL:
                     cv.put(BookDB.Book.OWNED, 0);
-                    if (cr.update(BookDB.Book.create(bookId), cv, null, null) == 1 && intent.getBooleanExtra(KEY_WEARABLE_INPUT, false)) {
+                    if (cr.update(BookDB.Book.create(bookId), cv, null, null) == 1 && intent.getBooleanExtra(EXTRA_WEARABLE_INPUT, false)) {
                         final Book book = getBook(bookId);
                         if (book != null) {
                             final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
@@ -158,6 +193,13 @@ public class PurchaseService extends IntentService {
 
                             NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, builder.build());
                         }
+                    }
+                    break;
+                case ADD_NOTE:
+                    final CharSequence notes = getExtraNotes(intent);
+                    if (!TextUtils.isEmpty(notes)) {
+                        cv.put(BookDB.Book.NOTES, notes.toString());
+                        cr.update(BookDB.Book.create(bookId), cv, null, null);
                     }
                     break;
                 default:
@@ -174,6 +216,17 @@ public class PurchaseService extends IntentService {
             }
         } finally {
             c.close();
+        }
+        return null;
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT_WATCH)
+    private CharSequence getExtraNotes(Intent intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
+            final Bundle result = RemoteInput.getResultsFromIntent(intent);
+            if (result != null) {
+                return result.getCharSequence(EXTRA_ADD_NOTE);
+            }
         }
         return null;
     }
