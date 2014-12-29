@@ -168,7 +168,7 @@ public class Book {
         this.mSource = source;
     }
 
-    public void setDescrition(String description) {
+    public void setDescription(String description) {
         this.mDescription = description;
     }
 
