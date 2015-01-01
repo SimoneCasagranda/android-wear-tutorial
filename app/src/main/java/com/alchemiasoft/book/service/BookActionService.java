@@ -57,7 +57,6 @@ public class BookActionService extends IntentService {
      * Available params.
      */
     private static final String EXTRA_BOOK_ID = "com.alchemiasoft.book.service.BOOK_ID";
-    private static final String EXTRA_ACTION = "com.alchemiasoft.book.service.ACTION";
     private static final String EXTRA_NOTIFICATION_ID = "com.alchemiasoft.book.service.NOTIFICATION_ID";
     private static final String EXTRA_WEARABLE_INPUT = "com.alchemiasoft.book.service.WEARABLE_INPUT";
     private static final String EXTRA_ADD_NOTE = "com.alchemiasoft.book.service.ADD_NOTE";
@@ -86,7 +85,7 @@ public class BookActionService extends IntentService {
         private IntentBuilder(Context context, Book book, Action action) {
             mIntent = new Intent(context, BookActionService.class);
             mIntent.putExtra(EXTRA_BOOK_ID, book.getId());
-            mIntent.putExtra(EXTRA_ACTION, action.ordinal());
+            mIntent.setAction(action.name());
         }
 
         public static IntentBuilder buy(@NonNull Context context, @NonNull Book book) {
@@ -156,7 +155,7 @@ public class BookActionService extends IntentService {
         final long bookId = intent.getLongExtra(EXTRA_BOOK_ID, NOT_VALID_BOOK);
         if (bookId != NOT_VALID_BOOK) {
             final ContentResolver cr = getContentResolver();
-            final Action action = Action.values()[intent.getIntExtra(EXTRA_ACTION, 0)];
+            final Action action = Action.valueOf(intent.getAction());
             Log.d(TAG_LOG, "Performing action=" + action + " on book with id=" + bookId);
             final ContentValues cv = new ContentValues();
             switch (action) {
