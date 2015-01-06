@@ -1,9 +1,19 @@
 Android Wear Tutorial
 =====================
 
-Code reference for a set of tutorials on [Android Wear][1].
+As the name suggest this repository serves as code reference for a set of tutorials on [Android Wear][1].
 
-**Start this journey from [Introduction to Wearables (Part1)][2]**
+Starting from a sample application running just on an handheld device, the code evolves to support and to take advantage of wearables devices.
+
+**More about this journey at:**
+
+1. [Introduction to Wearables][2]
+2. Landing on Wearables (debugging, extending notifications)
+3. Colonizing Wearables (running apps on an Android Wear)
+4. Pimp my Wear (custom UI’s)
+5. Data exchange and Sync
+6. Miscellaneous
+
 
 Developed By
 ============
