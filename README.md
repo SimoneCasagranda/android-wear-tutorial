@@ -8,7 +8,7 @@ Starting from a sample application running just on an handheld device, the code 
 **More about this journey at:**
 
 1. [Introduction to Wearables][2]
-2. Landing on Wearables (debugging, extending notifications)
+2. [Landing on Wearables][3] (debugging, extending notifications)
 3. Colonizing Wearables (running apps on an Android Wear)
 4. Pimp my Wear (custom UI’s)
 5. Data exchange and Sync
@@ -40,3 +40,4 @@ License
 
 [1]: http://www.android.com/wear/
 [2]: https://alchemiasoft.wordpress.com/2014/12/14/introduction-to-wearables/
+[3]: https://alchemiasoft.wordpress.com/2015/01/06/landing-on-wearables/
