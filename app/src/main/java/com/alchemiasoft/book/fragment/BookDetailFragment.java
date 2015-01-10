@@ -31,8 +31,8 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.alchemiasoft.book.R;
-import com.alchemiasoft.book.content.BookDB;
-import com.alchemiasoft.book.model.Book;
+import com.alchemiasoft.common.content.BookDB;
+import com.alchemiasoft.common.model.Book;
 import com.alchemiasoft.book.service.BookActionService;
 
 /**

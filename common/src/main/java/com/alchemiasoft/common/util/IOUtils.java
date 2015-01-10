@@ -14,17 +14,31 @@
  * limitations under the License.
  */
 
-package com.alchemiasoft.book.app;
+package com.alchemiasoft.common.util;
+
+import java.io.Closeable;
+import java.io.IOException;
 
 /**
- * Constants used by the application.
+ * Utility that can be used to work with I/O.
  * <p/>
  * Created by Simone Casagranda on 23/12/14.
  */
-public class Constants {
+public class IOUtils {
 
     /**
-     * Path for the books input path in the asset folder.
+     * Close a closeable without taking care of any error.
+     *
+     * @param closeable that has to be closed.
      */
-    public static final String BOOKS_PATH = "content/books.json";
+    public static void closeSilently(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                // Shh
+            }
+        }
+    }
 }
+

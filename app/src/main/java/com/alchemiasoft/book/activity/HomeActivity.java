@@ -30,7 +30,7 @@ import android.widget.Toast;
 import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.fragment.BookDetailFragment;
 import com.alchemiasoft.book.fragment.BooksFragment;
-import com.alchemiasoft.book.model.Book;
+import com.alchemiasoft.common.model.Book;
 import com.alchemiasoft.book.receiver.SuggestionReceiver;
 
 /**

@@ -14,31 +14,23 @@
  * limitations under the License.
  */
 
-package com.alchemiasoft.book.util;
+package com.alchemiasoft.common.util;
 
-import java.io.Closeable;
-import java.io.IOException;
+import android.app.AlarmManager;
+import android.content.Context;
 
 /**
- * Utility that can be used to work with I/O.
+ * Utility that allows to get the AlarmManager.
  * <p/>
- * Created by Simone Casagranda on 23/12/14.
+ * Created by Simone Casagranda on 27/12/14.
  */
-public class IOUtils {
+public class AlarmUtil {
 
-    /**
-     * Close a closeable without taking care of any error.
-     *
-     * @param closeable that has to be closed.
-     */
-    public static void closeSilently(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException e) {
-                // Shh
-            }
-        }
+    private AlarmUtil() {
+        throw new RuntimeException("Use static methods instead of trying to instantiate this utility.");
+    }
+
+    public static AlarmManager getAlarmManager(Context context) {
+        return (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
     }
 }
-

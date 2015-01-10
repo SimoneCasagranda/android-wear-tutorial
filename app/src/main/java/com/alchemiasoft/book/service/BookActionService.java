@@ -36,8 +36,8 @@ import android.util.Log;
 
 import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.activity.HomeActivity;
-import com.alchemiasoft.book.content.BookDB;
-import com.alchemiasoft.book.model.Book;
+import com.alchemiasoft.common.content.BookDB;
+import com.alchemiasoft.common.model.Book;
 
 /**
  * Service that allows to buy

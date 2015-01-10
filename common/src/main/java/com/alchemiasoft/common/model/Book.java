@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package com.alchemiasoft.book.model;
+package com.alchemiasoft.common.model;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.support.annotation.NonNull;
 
-import com.alchemiasoft.book.content.BookDB;
+import com.alchemiasoft.common.content.BookDB;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

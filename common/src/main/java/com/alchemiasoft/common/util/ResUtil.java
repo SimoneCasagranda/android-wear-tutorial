@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alchemiasoft.book.util;
+package com.alchemiasoft.common.util;
 
 import android.content.Context;
 import android.util.Log;

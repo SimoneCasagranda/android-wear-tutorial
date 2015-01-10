@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alchemiasoft.book.content;
+package com.alchemiasoft.common.content;
 
 import android.content.ContentProvider;
 import android.content.ContentProviderOperation;

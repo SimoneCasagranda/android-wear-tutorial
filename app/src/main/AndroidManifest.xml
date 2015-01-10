@@ -63,7 +63,7 @@
 
         <provider
             android:authorities="com.alchemiasoft.book.provider"
-            android:name=".content.BookContentProvider"
+            android:name="com.alchemiasoft.common.content.BookContentProvider"
             android:exported="false" />
     </application>
 

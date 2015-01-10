@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package com.alchemiasoft.book.util;
-
-import android.app.AlarmManager;
-import android.content.Context;
+package com.alchemiasoft.common.lib;
 
 /**
- * Utility that allows to get the AlarmManager.
+ * Constants used by the library.
  * <p/>
- * Created by Simone Casagranda on 27/12/14.
+ * Created by Simone Casagranda on 10/12/14.
  */
-public class AlarmUtil {
+public class Constants {
 
-    private AlarmUtil() {
-        throw new RuntimeException("Use static methods instead of trying to instantiate this utility.");
-    }
-
-    public static AlarmManager getAlarmManager(Context context) {
-        return (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-    }
+    /**
+     * Path for the books input path in the asset folder.
+     */
+    public static final String BOOKS_PATH = "content/books.json";
 }

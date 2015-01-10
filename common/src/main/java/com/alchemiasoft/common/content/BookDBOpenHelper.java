@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.alchemiasoft.book.content;
+package com.alchemiasoft.common.content;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -22,9 +22,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.alchemiasoft.book.app.Constants;
-import com.alchemiasoft.book.model.Book;
-import com.alchemiasoft.book.util.ResUtil;
+import com.alchemiasoft.common.lib.Constants;
+import com.alchemiasoft.common.model.Book;
+import com.alchemiasoft.common.util.ResUtil;
 
 import org.json.JSONArray;
 

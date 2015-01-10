@@ -38,11 +38,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alchemiasoft.book.R;
-import com.alchemiasoft.book.content.BookDB;
+import com.alchemiasoft.common.content.BookDB;
 import com.alchemiasoft.book.fragment.base.RecyclerViewFragment;
-import com.alchemiasoft.book.model.Book;
+import com.alchemiasoft.common.model.Book;
 import com.alchemiasoft.book.service.BookActionService;
-import com.alchemiasoft.book.util.ViewUtil;
+import com.alchemiasoft.common.util.ViewUtil;
 import com.alchemiasoft.book.widget.SmartSwipeRefreshLayout;
 
 import java.util.ArrayList;

@@ -26,7 +26,7 @@ import android.util.Log;
 
 import com.alchemiasoft.book.service.SuggestionService;
 import com.alchemiasoft.book.user.UserData;
-import com.alchemiasoft.book.util.AlarmUtil;
+import com.alchemiasoft.common.util.AlarmUtil;
 
 /**
  * WakefulBroadcastReceiver that spawn a SuggestionService when it's time to show the user a book
