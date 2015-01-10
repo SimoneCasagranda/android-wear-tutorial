@@ -39,6 +39,7 @@ public class Book {
 
     private long mId = NOT_VALID;
 
+    private String mServerId;
     private String mTitle;
     private String mAuthor;
     private String mSource;
@@ -46,6 +47,7 @@ public class Book {
     private int mPages;
     private String mNotes;
     private boolean mOwned;
+    private long mUpdatedAt;
 
     private Book() {
     }
@@ -53,6 +55,9 @@ public class Book {
     public static Book oneFrom(@NonNull Cursor c) {
         final Book book = new Book();
         int index;
+        if ((index = c.getColumnIndex(BookDB.Book.SERVER_ID)) > -1) {
+            book.mServerId = c.getString(index);
+        }
         if ((index = c.getColumnIndex(BookDB.Book._ID)) > -1) {
             book.mId = c.getLong(index);
         }
@@ -77,6 +82,9 @@ public class Book {
         if ((index = c.getColumnIndex(BookDB.Book.OWNED)) > -1) {
             book.mOwned = c.getInt(index) == 1 ? true : false;
         }
+        if ((index = c.getColumnIndex(BookDB.Book.UPDATED_AT)) > -1) {
+            book.mUpdatedAt = c.getLong(index);
+        }
         return book;
     }
 
@@ -91,6 +99,7 @@ public class Book {
 
     public static Book oneFrom(@NonNull JSONObject json) {
         final Book book = new Book();
+        book.mServerId = json.optString("serverId");
         book.mTitle = json.optString("title");
         book.mAuthor = json.optString("author");
         book.mSource = json.optString("source");
@@ -110,6 +119,7 @@ public class Book {
 
     public ContentValues toValues() {
         final ContentValues cv = new ContentValues();
+        cv.put(BookDB.Book.SERVER_ID, mServerId);
         cv.put(BookDB.Book.TITLE, mTitle);
         cv.put(BookDB.Book.AUTHOR, mAuthor);
         cv.put(BookDB.Book.SOURCE, mSource);
@@ -122,6 +132,10 @@ public class Book {
 
     public long getId() {
         return mId;
+    }
+
+    public String getServerId() {
+        return mServerId;
     }
 
     public String getTitle() {
@@ -150,6 +164,14 @@ public class Book {
 
     public String getNotes() {
         return mNotes;
+    }
+
+    public long getUpdatedAt() {
+        return mUpdatedAt;
+    }
+
+    public void setServerId(String serverId) {
+        this.mServerId = serverId;
     }
 
     public void setId(long mId) {
@@ -184,10 +206,14 @@ public class Book {
         this.mNotes = notes;
     }
 
+    public void setUpdatedAt(long time) {
+        this.mUpdatedAt = time;
+    }
+
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder();
-        sb.append(mTitle).append(" - ").append(mAuthor).append(" (").append(mPages).append(").");
+        sb.append(mTitle).append(" - ").append(mAuthor).append(" (").append(mPages).append("--" + mServerId + ").");
         return sb.toString();
     }
 }

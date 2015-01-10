@@ -124,6 +124,7 @@ public class BookContentProvider extends ContentProvider {
             case 0:
                 selection = BookDB.Book._ID + " = ?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
+                values.put(BookDB.Book.UPDATED_AT, System.currentTimeMillis());
                 result = mDbHelper.getWritableDatabase().update(BookDB.Book.TABLE, values, selection, selectionArgs);
                 break;
             case 1:
