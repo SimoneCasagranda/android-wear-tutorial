@@ -26,6 +26,9 @@
         android:theme="@android:style/Theme.DeviceDefault.Light">
         <activity
             android:name=".activity.BooksActivity"
+            android:exported="true"
+            android:allowEmbedded="true"
+            android:taskAffinity=""
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
