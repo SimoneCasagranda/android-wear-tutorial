@@ -20,11 +20,21 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".Books"
-    tools:deviceIds="wear_square">
+    tools:deviceIds="wear_square"
+    android:padding="@dimen/padding_books_info_square">
 
     <TextView
-        android:id="@+id/text"
+        android:id="@+id/text_book_app"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_square" />
+        android:text="@string/books_on_android_wear"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/books_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        tools:text="There are 10 book(s).\n5 of them are in your library." />
 </LinearLayout>

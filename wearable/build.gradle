@@ -18,15 +18,15 @@ apply plugin: 'com.android.application'
 
 
 android {
-    compileSdkVersion 21
-    buildToolsVersion "21.1.2"
+    compileSdkVersion project.compileSdkVersion
+    buildToolsVersion project.buildToolsVersion
 
     defaultConfig {
-        applicationId "com.alchemiasoft.android_wear_tutorial"
+        applicationId project.applicationId
         minSdkVersion 20
         targetSdkVersion 21
-        versionCode 1
-        versionName "1.0"
+        versionCode project.versionCode
+        versionName project.versionName
     }
     buildTypes {
         release {

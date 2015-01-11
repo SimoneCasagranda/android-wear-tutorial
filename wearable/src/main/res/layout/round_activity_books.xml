@@ -19,13 +19,25 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".Books"
-    tools:deviceIds="wear_round">
+    tools:deviceIds="wear_round"
+    android:padding="@dimen/padding_books_info_round">
 
     <TextView
-        android:id="@+id/text"
+        android:id="@+id/text_book_app"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:text="@string/books_on_android_wear"
+        android:layout_above="@+id/books_info"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/hello_round" />
+        android:layout_marginBottom="5dp"
+        android:gravity="center"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/books_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:gravity="center"
+        tools:text="There are 10 book(s).\n5 of them are in your library." />
 </RelativeLayout>
