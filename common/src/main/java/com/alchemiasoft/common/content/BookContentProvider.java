@@ -27,6 +27,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
 
+import com.alchemiasoft.common.util.UriUtil;
+
 import java.util.ArrayList;
 
 /**
@@ -64,15 +66,16 @@ public class BookContentProvider extends ContentProvider {
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         final int code = mUriMatcher.match(uri);
+        final String limit = UriUtil.getLimit(uri);
         Cursor cursor;
         switch (code) {
             case 0:
                 selection = BookDB.Book._ID + " = ?";
                 selectionArgs = new String[]{uri.getLastPathSegment()};
-                cursor = mDbHelper.getWritableDatabase().query(BookDB.Book.TABLE, projection, selection, selectionArgs, null, null, null);
+                cursor = mDbHelper.getWritableDatabase().query(BookDB.Book.TABLE, projection, selection, selectionArgs, null, null, null, limit);
                 break;
             case 1:
-                cursor = mDbHelper.getWritableDatabase().query(BookDB.Book.TABLE, projection, selection, selectionArgs, null, null, sortOrder);
+                cursor = mDbHelper.getWritableDatabase().query(BookDB.Book.TABLE, projection, selection, selectionArgs, null, null, sortOrder, limit);
                 break;
             default:
                 throw new IllegalArgumentException("Uri not valid for ContentProvider " + uri);

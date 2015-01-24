@@ -17,100 +17,163 @@
 package com.alchemiasoft.books.activity;
 
 import android.app.Activity;
-import android.content.ContentResolver;
-import android.content.Context;
+import android.app.Fragment;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.wearable.view.WatchViewStub;
-import android.util.Pair;
-import android.widget.TextView;
+import android.support.v4.app.FragmentActivity;
+import android.support.wearable.view.CardFragment;
+import android.support.wearable.view.FragmentGridPagerAdapter;
+import android.support.wearable.view.GridViewPager;
 
 import com.alchemiasoft.books.R;
-import com.alchemiasoft.common.content.BookDB;
+import com.alchemiasoft.common.util.UriUtil;
 
-import java.lang.ref.WeakReference;
+import static com.alchemiasoft.common.content.BookDB.Book;
 
 /**
  * Activity that displays some of the info about all the available books.
  */
-public class BooksActivity extends Activity {
+public class BooksActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
     /**
-     * UI references
+     * Loader id.
      */
-    private TextView mInfoTextView;
+    private static final int LOADER_ID_SUGGESTIONS = 23;
 
     /**
-     * AsyncTask used to load the info.
+     * Usually we don't want to display more than 5 rows in the 2D Picker.
+     * This is done because we don't want to display tons of content to the user.
      */
-    private BooksInfoTask mInfoTask;
+    private static final int MAX_ROWS = 5;
+
+    /**
+     * Query params.
+     */
+    private static final String[] PROJECTION = {Book._ID, Book.TITLE, Book.AUTHOR, Book.DESCRIPTION, Book.NOTES};
+    private static final String SELECTION = Book.OWNED + " = ?";
+    private static final String[] SELECTION_ARGS = {String.valueOf(0)};
+    private static final String ORDER_BY = null;
+
+    private GridViewPager mViewPager;
+    private BooksGridPagerAdapter mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_books);
-        final WatchViewStub stub = (WatchViewStub) findViewById(R.id.watch_view_stub);
-        stub.setOnLayoutInflatedListener(new WatchViewStub.OnLayoutInflatedListener() {
-            @Override
-            public void onLayoutInflated(WatchViewStub stub) {
-                mInfoTextView = (TextView) stub.findViewById(R.id.books_info);
-                // Loading the books info through an AsyncTask just to show
-                // something on the wearable device
-                // N.B.: (this will change in part 4).
-                mInfoTask = new BooksInfoTask(BooksActivity.this);
-                mInfoTask.execute();
-            }
-        });
+        // Getting UI references
+        mViewPager = (GridViewPager) findViewById(R.id.pager);
+        // Creating and Setting the Pager adapter
+        mAdapter = new BooksGridPagerAdapter(this);
+        mViewPager.setAdapter(mAdapter);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getLoaderManager().initLoader(LOADER_ID_SUGGESTIONS, null, this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        getLoaderManager().destroyLoader(LOADER_ID_SUGGESTIONS);
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+        switch (id) {
+            case LOADER_ID_SUGGESTIONS:
+                return new CursorLoader(this, UriUtil.withLimit(Book.CONTENT_URI, MAX_ROWS), PROJECTION, SELECTION, SELECTION_ARGS, ORDER_BY);
+            default:
+                throw new IllegalArgumentException("Loader id=" + id + " is not supported!");
+        }
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mAdapter.swapCursor(null);
     }
 
     /**
-     * AsyncTask that loads asynchronously the books info.
+     * Adapter used to display books in pages. Following the Android Wear Design Guidelines,
+     * all the elements will be displayed per row and in the columns the user will be able to find
+     * detailed info and button actions.
+     * <p/>
+     * e.g.:
+     * column 1    column 2    column3     column N
+     * _____________________________________________
+     * row 1  | title 1     info 1      action 3    action N
+     * row 2  | title 2     ...
+     * row N  |  ...
      */
-    private static final class BooksInfoTask extends AsyncTask<Void, Void, Pair<Integer, Integer>> {
+    private static final class BooksGridPagerAdapter extends FragmentGridPagerAdapter {
 
-        private final String[] PROJECTION = {BookDB.Book.OWNED};
+        /**
+         * Columns
+         */
+        private static final int TITLE = 0;
+        private static final int DESCRIPTION = 1;
+        private static final int NOTES = 2;
 
-        private final WeakReference<BooksActivity> mActivityRef;
+        /**
+         * Cursor used as books source.
+         */
+        private Cursor mCursor;
 
-        private final Context mAppContext;
+        /**
+         * Activity reference.
+         */
+        private final Activity mActivity;
 
-        private BooksInfoTask(BooksActivity activity) {
-            mActivityRef = new WeakReference<>(activity);
-            mAppContext = activity.getApplicationContext();
+        private BooksGridPagerAdapter(FragmentActivity activity) {
+            super(activity.getFragmentManager());
+            mActivity = activity;
         }
 
         @Override
-        protected Pair<Integer, Integer> doInBackground(Void... params) {
-            final ContentResolver resolver = mAppContext.getContentResolver();
-            int totalCount = 0, ownedCount = 0;
-            final Cursor c = resolver.query(BookDB.Book.CONTENT_URI, PROJECTION, null, null, null);
-            try {
-                totalCount = c.getCount();
-                final int ownedIndex = c.getColumnIndex(BookDB.Book.OWNED);
-                while (c.moveToNext()) {
-                    if (c.getInt(ownedIndex) > 0) {
-                        ownedCount++;
-                    }
-                }
-            } finally {
-                c.close();
+        public Fragment getFragment(int row, int column) {
+            // Positioning the cursor at the right row
+            mCursor.moveToPosition(row);
+            // Matching the fragment by column
+            switch (column) {
+                case TITLE:
+                    final String title = mCursor.getString(mCursor.getColumnIndex(Book.TITLE));
+                    final String author = mCursor.getString(mCursor.getColumnIndex(Book.AUTHOR));
+                    return CardFragment.create(title, author);
+                case DESCRIPTION:
+                    final String description = mCursor.getString(mCursor.getColumnIndex(Book.DESCRIPTION));
+                    return CardFragment.create(mActivity.getString(R.string.description), description);
+                case NOTES:
+                    return CardFragment.create("Row:" + row, "Column: " + column);
+                default:
+                    throw new IllegalArgumentException("getFragment(row=" + row + ", column=" + column + ")");
             }
-            return new Pair<>(totalCount, ownedCount);
         }
 
         @Override
-        protected void onPostExecute(Pair<Integer, Integer> pair) {
-            super.onPostExecute(pair);
-            final BooksActivity activity = getActivity();
-            if (activity != null) {
-                String info = activity.getString(R.string.format_available_books, pair.first, pair.second);
-                activity.mInfoTextView.setText(info);
-            }
+        public int getRowCount() {
+            return mCursor == null ? 0 : mCursor.getCount();
         }
 
-        private BooksActivity getActivity() {
-            return mActivityRef == null ? null : mActivityRef.get();
+        @Override
+        public int getColumnCount(int row) {
+            return 3;
+        }
+
+        public Cursor swapCursor(Cursor cursor) {
+            final Cursor oldCursor = mCursor;
+            mCursor = cursor;
+            notifyDataSetChanged();
+            return oldCursor;
         }
     }
 }

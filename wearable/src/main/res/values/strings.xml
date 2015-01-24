@@ -20,5 +20,6 @@
 
     <string name="format_available_books">There are %1$d book(s).\n%2$d of them are in your library.</string>
     <string name="books_on_android_wear">Books on Android Wear!</string>
+    <string name="description">Description</string>
 
 </resources>
