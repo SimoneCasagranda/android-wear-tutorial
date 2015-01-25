@@ -48,6 +48,7 @@ public class Book {
     private String mNotes;
     private boolean mOwned;
     private long mUpdatedAt;
+    private String mTag;
 
     private Book() {
     }
@@ -85,6 +86,9 @@ public class Book {
         if ((index = c.getColumnIndex(BookDB.Book.UPDATED_AT)) > -1) {
             book.mUpdatedAt = c.getLong(index);
         }
+        if ((index = c.getColumnIndex(BookDB.Book.TAG)) > -1) {
+            book.mTag = c.getString(index);
+        }
         return book;
     }
 
@@ -105,6 +109,7 @@ public class Book {
         book.mSource = json.optString("source");
         book.mDescription = json.optString("description");
         book.mPages = json.optInt("pages");
+        book.mTag = json.optString("tag");
         return book;
     }
 
@@ -127,6 +132,7 @@ public class Book {
         cv.put(BookDB.Book.PAGES, mPages);
         cv.put(BookDB.Book.NOTES, mNotes);
         cv.put(BookDB.Book.OWNED, mOwned);
+        cv.put(BookDB.Book.TAG, mTag);
         return cv;
     }
 
@@ -170,6 +176,10 @@ public class Book {
         return mUpdatedAt;
     }
 
+    public String getTag() {
+        return mTag;
+    }
+
     public void setServerId(String serverId) {
         this.mServerId = serverId;
     }
@@ -208,6 +218,10 @@ public class Book {
 
     public void setUpdatedAt(long time) {
         this.mUpdatedAt = time;
+    }
+
+    public void setTag(String tag) {
+        this.mTag = tag;
     }
 
     @Override

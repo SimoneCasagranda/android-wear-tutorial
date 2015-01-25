@@ -24,5 +24,6 @@
     <string name="notes">Notes</string>
     <string name="buy">Buy book</string>
     <string name="item_purchased">Purchased</string>
+    <string name="add_notes">Add notes</string>
 
 </resources>

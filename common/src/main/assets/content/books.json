@@ -5,6 +5,7 @@
         "author": "Reto Meier",
         "pages": 817,
         "source": "Amazon.com, Inc.",
+        "tag": "android",
         "description" : "The fast-growing popularity of Android smart phones and tablets creates a huge opportunities for developers. If you're an experienced developer, you can start creating robust mobile Android apps right away with this professional guide to Android 4 application development. Written by one of Google's lead Android developer advocates, this practical book walks you through a series of hands-on projects that illustrate the features of the Android SDK. That includes all the new APIs introduced in Android 3 and 4, including building for tablets, using the Action Bar, Wi-Fi Direct, NFC Beam, and more."
     },
     {
@@ -13,6 +14,7 @@
         "author": "Massimo Carli",
         "pages": 432,
         "source": "Amazon.com, Inc.",
+        "tag": "android",
         "description" : "Android è un sistema operativo open source per dispositivi mobili basato su Linux. La sua struttura aperta permette di personalizzare le funzioni principali del sistema e sviluppare applicazioni.L’obiettivo di questo libro è quello di guidare il lettore attraverso tutte le fasi necessarie alla realizzazione di un'applicazione Android caratterizzata da una forte integrazione con sistemi esterni. Particolare attenzione è dedicata a passaggi chiave come la gestione dell'interfaccia grafica, la comunicazione tra le componenti, l'interazione con fonti di dati, fino alla pubblicazione sull'Android Market.Grazie a questo testo, aggiornato alla versione 2.3 della piattaforma, gli sviluppatori avranno tutti gli strumenti e le conoscenze fondamentali per creare applicazioni dedicate a smartphone, ma anche a tablet altri device."
     },
     {
@@ -21,6 +23,7 @@
         "author": "Massimo Carli",
         "pages": 565,
         "source": "Amazon.com, Inc.",
+        "tag": "android",
         "description" : "La versione 3 di Android, il sistema operativo open source di Google dedicato ai dispositivi mobili, apre agli sviluppatori un mondo di nuove possibilità. Android 3 introduce novità a partire dall'interfaccia utente, completamente rinnovata e arricchita dal punto di vista grafico e funzionale, ma soprattutto sfrutta le nuove possibilità offerte dai tablet: display di dimensioni maggiori e processori più potenti. Il testo si articola in un percorso formativo che parte dalla scoperta dell'ambiente di sviluppo entrando poi nel vivo delle possibilità offerte dalla piattaforma e insegnando come gestire l'interfaccia, le comunicazioni tra le componenti, l'interazione con il Web, per arrivare a illustrare metodi di programmazione avanzata. Questa guida accompagna il lettore alla scoperta degli strumenti necessari a progettare e realizzare applicazioni funzionali per le diverse tipologie di device, smartphone e tablet, prendendo come riferimento Android 2.3 Gingerbread e Android 3.2 Honeycomb."
     },
     {
@@ -29,6 +32,7 @@
         "author": "Jonathan Knudsen",
         "pages": 0,
         "source": "Amazon.com, Inc.",
+        "tag": "java",
         "description" : "Cryptography, the science of secret writing, is the biggest, baddest security tool in the application programmer's arsenal. Cryptography provides three services that are crucial in secure programming. These include a cryptographic cipher that protects the secrecy of your data; cryptographic certificates, which prove identity (authentication); and digital signatures, which ensure your data has not been damaged or tampered with. This book covers cryptographic programming in Java. Java 1.1 and Java 1.2 provide extensive support for cryptography with an elegant architecture, the Java Cryptography Architecture (JCA). Another set of classes, the Java Cryptography Extension (JCE), provides additional cryptographic functionality. This book covers the JCA and the JCE from top to bottom, describing the use of the cryptographic classes as well as their innards. The book is designed for moderately experienced Java programmers who want to learn how to build cryptography into their applications. No prior knowledge of cryptography is assumed. The book is peppered with useful examples, ranging from simple demonstrations in the first chapter to full-blown applications in later chapters. Topics include: * The Java Cryptography Architecture (JCA) * The Java Cryptography Extension (JCE) * Cryptographic providers * The Sun key management tools * Message digests, digital signatures, and certificates (X509v3) * Block and stream ciphers * Implementations of the ElGamal signature and cipher algorithms * A network talk application that encrypts all data sent over the network * An email application that encrypts its messages Covers JDK 1.2 and JCE 1.2."
     },
     {
@@ -37,6 +41,7 @@
         "author": "Jose Sandoval",
         "pages": 258,
         "source": "Amazon.com, Inc.",
+        "tag": "java",
         "description" : "The approach we take is ideal for software developers with some, or extensive, programming experience: we design a RESTful API, which serves as our software specification, and implement it with every framework discussed in the book—there are no hypothetical examples; only practical working applications. This book is for Java developers who want to code RESTful web services using any of the open source RESTful frameworks available to date, for example, JAX-RS implementations such as Jersey and RESTEasy, the Restlet lightweight framework, or Struts 2 with the REST plug-in. You don't need to know REST, as we cover the theory of REST and web services; however, you should be familiar with the Java language and have some understanding of Java web applications. For each framework, we develop the same web service outlined in Chapter 4, so there is lots of working code available. This is a practical guide and the majority of the book is about coding RESTful web services, and not just about the theory of REST."
     },
     {
@@ -61,6 +66,7 @@
         "author": "Rohit Ghatol , Yogesh Patel",
         "pages": 344,
         "source": "Apress Media LLC",
+        "tag": "javascript",
         "description" : "PhoneGap is a growing and leading open-source mobile web apps development framework that lets developers build JavaScript and HTML5-based web applications with native wrappers for more than six mobile platforms, including iOS, Android, and BlackBerry. This framework lets you build HTML- and JavaScript-based apps and still take advantage of native mobile device capabilities like camera, localStorage, geolocation, storage and much more, irrespective of the mobile platform you target. It also lets you use more specialized JavaScript frameworks like jQuery Mobile and more. Beginning PhoneGap is a definitive, one-of-a-kind book that teaches the fundamentals and strategies behind cross-platform mobile application development. Instead of learning languages like Objective-C, focus on building apps from day one for Android, iOS, Blackberry, WebOS and Symbian—without the complexities of these platforms. This book shows how to build apps which makes use of Google Local Search to create a Restaurant finder apps (which uses Maps to layout locations and uses internal database to store your favorite restaurants. Furthermore, you'll learn how to extend PhoneGap's functionality by using PhoneGap plugins to write apps like Dropbox (syncing files in the background outside HTML/JavaScript code and in native code). By the time you finish Beginning PhoneGap, you'll know PhoneGap inside and out, and, consequently, be able to develop mobile web apps faster and more efficiently than ever before. Make more money in less time!"
     },
     {
@@ -69,6 +75,7 @@
         "author": "Satya Komatineni, Dave MacLean",
         "pages": 1020,
         "source": "Amazon.com, Inc.",
+        "tag": "android",
         "description" : "Pro Android 4 shows you how to build real-world and fun mobile apps using the new Android SDK 4 (Ice Cream Sandwich), which unifies Gingerbread for smartphones, Honeycomb for tablets and augments further with Google TV and more. This Android 4 book updates the best selling Pro Android 3 and covers everything from the fundamentals of building apps for embedded devices, smartphones, and tablets to advanced concepts such as custom 3D components, multi-tasking, sensors/augmented reality, better accessories support and much more."
     },
     {
@@ -77,6 +84,7 @@
         "author": "Jon Loeliger",
         "pages": 330,
         "source": "Amazon.com, Inc.",
+        "tag": "git",
         "description" : "Version Control with Git takes you step-by-step through ways to track, merge, and manage software projects, using this highly flexible, open source version control system. Git permits virtually an infinite variety of methods for development and collaboration. Created by Linus Torvalds to manage development of the Linux kernel, it's become the principal tool for distributed version control. But Git's flexibility also means that some users don't understand how to use it to their best advantage. Version Control with Git offers tutorials on the most effective ways to use it, as well as friendly yet rigorous advice to help you navigate Git's many functions."
     },
     {
@@ -85,6 +93,7 @@
         "author": "Jeff Six",
         "pages": 114,
         "source": "O'Reilly Media",
+        "tag": "android",
         "description" : "With the Android platform fast becoming a target of malicious hackers, application security is crucial. This concise book provides the knowledge you need to design and implement robust, rugged, and secure apps for any Android device. You’ll learn how to identify and manage the risks inherent in your design, and work to minimize a hacker’s opportunity to compromise your app and steal user data. How is the Android platform structured to handle security? What services and tools are available to help you protect data? Up until now, no single resource has provided this vital information. With this guide, you’ll learn how to address real threats to your app, whether or not you have previous experience with security issues."
     },
     {
@@ -93,6 +102,7 @@
         "author": "Sheran A. Gunasekera",
         "pages": 248,
         "source": "Amazon.com, Inc.",
+        "tag": "android",
         "description" : "Android Apps Security provides guiding principles for how to best design and develop Android apps with security in mind. It explores concepts that can be used to secure apps and how developers can use and incorporate these security features into their apps. This book will provide developers with the information they need to design useful, high-performing, and secure apps that expose end-users to as little risk as possible."
     },
     {
@@ -101,6 +111,7 @@
         "author": "Shawn Van Every",
         "pages": 320,
         "source": "Apress Media LLC",
+        "tag": "android",
         "description" : "Mobile devices have evolved to focus on rich media production and consumption. Developers of mobile applications are able to create applications that allow people to play, capture, and share media in a variety of new ways on mobile devices. The popularity of Android has soared in part because the platform offers developers a rich set of capabilities including access to media capturing and playback functions. Pro Android Media provides concise and clear instruction on how to utilize the media APIs made available through Android to create dynamic apps. It takes you from a simple means to gain access to the camera to complex video capture and sharing examples. It also covers sound, graphics, painting, and more—everything you need to make your app come \"alive.\""
     },
     {
@@ -109,6 +120,7 @@
         "author": "Wei Meng Lee",
         "pages": 408,
         "source": "Amazon.com, Inc.",
+        "tag": "android",
         "description" : "The popularity of Google Android devices is seemingly unstoppable and the Android 4 release offers, for the first time, a single OS solution for building both phone and tablet applications. With that exciting information in mind, veteran author Wei-Meng Lee presents you with 100 unique recipes that you can apply today in order to discover solutions to some of the most commonly encountered problems that exist in Android programming. Covering the scope of multiple Android releases up through Android 4, this reference features a task description, followed by the solution(s) available, and a standalone project file that illustrates the use of the recipe. Formatting each recipe to be standalone, Wei-Meng Lee allows you to jump into the relevant recipe to find a solution to specific challenges."
     },
     {
@@ -117,6 +129,7 @@
         "author": "Dave Smith, Jeff Frisen",
         "pages": 456,
         "source": "Google Inc.",
+        "tag": "android",
         "description" : "Android continues to be one of the leading mobile OS and development platforms driving today's mobile innovations and the apps ecosystem. Android appears complex, but offers a variety of organized development kits to those coming into Android with differing programming language skill sets. Android Recipes: A Problem-Solution Approach guides you step-by-step through a wide range of useful topics using complete and real-world working code examples. In this book, you'll start off with a recap of Android architecture and app fundamentals, and then get down to business and build an app with Google’s Android SDK at the command line and Eclipse. Next, you'll learn how to accomplish practical tasks pertaining to the user interface, communications with the cloud, device hardware, data persistence, communications between applications, and interacting with Android itself. Finally, you'll learn how to leverage various libraries and Scripting Layer for Android (SL4A) to help you perform tasks more quickly, how to use the Android NDK to boost app performance, and how to design apps for performance, responsiveness, seamlessness, and more. Instead of abstract descriptions of complex concepts, in Android Recipes, you'll find live code examples. When you start a new project, you can consider copying and pasting the code and configuration files from this book, then modifying them for your own customization needs. This can save you a great deal of work over creating a project from scratch!"
     },
     {
@@ -125,6 +138,7 @@
         "author": "Carlos Sessa",
         "pages": 216,
         "source": "Amazon.com, Inc.",
+        "tag": "android",
         "description" : "The best programming techniques are often the shortest and simplest—the hacks. In this compact and infinitely useful book, Android expert Carlos Sessa delivers 50 hacks that will save you time, stretch your skills, and maybe even make you smile. Hacks. Clever programming techniques to solve thorny little problems. Ten lines of code that save you two days of work. The little gems you learn from the old guy in the next cube or from the geniuses on Stack Overflow. That's just what you'll find in this compact and useful book. The name 50 Android Hacks says it all. Ranging from the mundane to the spectacular, each self-contained, fully illustrated hack is just a couple of pages long and includes annotated source code. These practical techniques are organized into twelve collections covering layout, animations, patterns, and more."
     },
     {
@@ -133,6 +147,7 @@
         "author": "Hervé Guihot",
         "pages": 288,
         "source": "Apress Media LLC",
+        "tag": "android",
         "description" : "Today's Android apps developers are often running into the need to refine, improve and optimize their apps performances. As more complex apps can be created, it is even more important for developers to deal with this critical issue. Android allows developers to write apps using Java, C or a combination of both with the Android SDK and the Android NDK. Pro Android Apps Performance Optimization reveals how to fine-tune your Android apps, making them more stable and faster."
     },
     {
@@ -141,6 +156,7 @@
         "author": "Satya Komatineni & Dave MacLean",
         "pages": 436,
         "source": "Apress Media LLC",
+        "tag": "android",
         "description" : "From the leading publisher of Android books, Apress’ Expert Android gives you advanced techniques for customizing views, controls, and layouts. You’ll learn to develop apps in record time using JSON, Advanced Form Processing, and the BaaS (Backend As A Service) platform Parse. The book also includes extensive coverage on OpenGL, Search, and Telephony. With these advanced and time saving technologies you’ll be able to release compelling mobile applications in Google Play and the Amazon Appstore at a rapid pace."
     },
     {
@@ -149,6 +165,7 @@
         "author": "Mike Wolfson",
         "pages": 250,
         "source": "O'Reilly Media",
+        "tag": "android",
         "description" : "Android development can be challenging, but through the effective use of Android Developer Tools (ADT), you can make the process easier and improve the quality of your code. This concise guide demonstrates how to build apps with ADT for a device family that features several screen sizes, different hardware capabilities, and a varying number of resources. With examples in Windows, Linux, and Mac OS X, you’ll learn how to set up an Android development environment and use ADT with the Eclipse IDE. Also, contributor Donn Felker introduces Android Studio, a Google IDE that will eventually replace Eclipse."
     },
     {
@@ -157,6 +174,7 @@
         "author": "Dean Wampler",
         "pages": 90,
         "source": "O'Reilly Media",
+        "tag": "java",
         "description" : "Software development today is embracing functional programming (FP), whether it's for writing concurrent programs or for managing Big Data. Where does that leave Java developers? This concise book offers a pragmatic, approachable introduction to FP for Java developers or anyone who uses an object-oriented language. Dean Wampler, Java expert and author of Programming Scala (O'Reilly), shows you how to apply FP principles such as immutability, avoidance of side-effects, and higher-order functions to your Java code. Each chapter provides exercises to help you practice what you've learned. Once you grasp the benefits of functional programming, you’ll discover that it improves all of the code you write."
     },
     {
@@ -165,6 +183,7 @@
         "author": "Venkat Subramaniam",
         "pages": 280,
         "source": "O'Reilly Media",
+        "tag": "java",
         "description" : "More than ever, learning to program concurrency is critical to creating faster, responsive applications. Speedy and affordable multicore hardware is driving the demand for high-performing applications, and you can leverage the Java platform to bring these applications to life. Concurrency on the Java platform has evolved, from the synchronization model of JDK to software transactional memory (STM) and actor-based concurrency. This book is the first to show you all these concurrency styles so you can compare and choose what works best for your applications. You'll learn the benefits of each of these models, when and how to use them, and what their limitations are. Through hands-on exercises, you'll learn how to avoid shared mutable state and how to write good, elegant, explicit synchronization-free programs so you can create easy and safe concurrent applications. The techniques you learn in this book will take you from dreading concurrency to mastering and enjoying it. Best of all, you can work with Java or a JVM language of your choice - Clojure, JRuby, Groovy, or Scala - to reap the growing power of multicore hardware. If you are a Java programmer, you'd need JDK 1.5 or later and the Akka 1.0 library. In addition, if you program in Scala, Clojure, Groovy or JRuby you'd need the latest version of your preferred language. Groovy programmers will also need GPars."
     },
     {
@@ -173,6 +192,7 @@
         "author": "Brian Göetz, Tim Peierls, Joshua Bloch, Joseph Bowbeer, David Holmes & Doug Lea",
         "pages": 384,
         "source": "Amazon.com, Inc.",
+        "tag": "java",
         "description" : "Threads are a fundamental part of the Java platform. As multicore processors become the norm, using concurrency effectively becomes essential for building high-performance applications. Java SE 5 and 6 are a huge step forward for the development of concurrent applications, with improvements to the Java Virtual Machine to support high-performance, highly scalable concurrent classes and a rich set of new concurrency building blocks. In Java Concurrency in Practice, the creators of these new facilities explain not only how they work and how to use them, but also the motivation and design patterns behind them. However, developing, testing, and debugging multithreaded programs can still be very difficult; it is all too easy to create concurrent programs that appear to work, but fail when it matters most: in production, under heavy load.Java Concurrency in Practicearms readers with both the theoretical underpinnings and concrete techniques for building reliable, scalable, maintainable concurrent applications. Rather than simply offering an inventory of concurrency APIs and mechanisms, it provides design rules, patterns, and mental models that make it easier to build concurrent programs that are both correct and performant."
     },
     {
@@ -181,6 +201,7 @@
         "author": "Wallace Jackson",
         "pages": 620,
         "source": "Apress Media LLC",
+        "tag": "android",
         "description" : "Pro Android Graphics is a comprehensive goldmine of knowledge and techniques that will help you design, create, and optimize 2D graphics for use in your Android Jelly Bean applications. Android application developer and expert multimedia producer Wallace Jackson of Mind Taffy Design shows you how to leverage Android's powerful graphics APIs in conjunction with professional open source graphics design tools such as GIMP 2.8.6 and more."
     },
     {
@@ -189,6 +210,7 @@
         "author": "Godfrey Nolan",
         "pages": 232,
         "source": "Apress Media LLC",
+        "tag": "android",
         "description" : "Android Best Practices by Godfrey Nolan shows you how to make your Android apps stand out from the crowd with great reviews. Why settle for just making any Android app? Build a brilliant Android app instead that lets your users praise it for ease of use, better performance, and more. Using a series of example apps which gradually evolve throughout this book, Android Best Practices brings together current Android best practices from user interface (UI)/user experience (UX) design, test-driven development (TDD), and design patterns (e.g., MVC) to help you take your app to the next level."
     },
     {

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2015 Simone Casagranda.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,10 +14,9 @@
   ~ limitations under the License.
   -->
 
-<resources>
-    <dimen name="padding_books_info_square">5dp</dimen>
-    <dimen name="padding_books_info_round">3dp</dimen>
-    <dimen name="margin_bottom_page_indicator">12dp</dimen>
-    <dimen name="circle_radius">55dp</dimen>
-    <dimen name="circle_border_width">10dp</dimen>
-</resources>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <solid android:color="@color/fade" />
+
+</shape>

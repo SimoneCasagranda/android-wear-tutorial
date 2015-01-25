@@ -22,17 +22,19 @@ import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Loader;
 import android.database.Cursor;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.wearable.view.CardFragment;
+import android.support.wearable.view.CrossfadeDrawable;
 import android.support.wearable.view.DotsPageIndicator;
 import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.support.wearable.view.GridViewPager;
 import android.text.TextUtils;
 
 import com.alchemiasoft.books.R;
+import com.alchemiasoft.books.fragment.AddNoteFragment;
 import com.alchemiasoft.books.fragment.BuyBookFragment;
-import com.alchemiasoft.books.fragment.TakeNoteFragment;
 import com.alchemiasoft.common.util.UriUtil;
 
 import static com.alchemiasoft.common.content.BookDB.Book;
@@ -40,7 +42,7 @@ import static com.alchemiasoft.common.content.BookDB.Book;
 /**
  * Activity that displays some of the info about all the available books.
  */
-public class BooksActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class BooksActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, GridViewPager.OnPageChangeListener {
 
     /**
      * Loader id.
@@ -54,9 +56,14 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
     private static final int MAX_ROWS = 5;
 
     /**
+     * Fading values.
+     */
+    private static final float NO_FADE = 0f, PARTIAL_FADE = 0.7f;
+
+    /**
      * Query params.
      */
-    private static final String[] PROJECTION = {Book._ID, Book.TITLE, Book.AUTHOR, Book.DESCRIPTION, Book.NOTES};
+    private static final String[] PROJECTION = {Book._ID, Book.TITLE, Book.AUTHOR, Book.DESCRIPTION, Book.NOTES, Book.TAG};
     private static final String SELECTION = Book.OWNED + " = ?";
     private static final String[] SELECTION_ARGS = {String.valueOf(0)};
     private static final String ORDER_BY = null;
@@ -69,6 +76,8 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
     private GridViewPager mViewPager;
     private BooksGridPagerAdapter mAdapter;
 
+    private CrossfadeDrawable mCrossfadeDrawable;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,11 +85,17 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
         // Getting UI references
         mPageIndicator = (DotsPageIndicator) findViewById(R.id.pager_indicator);
         mViewPager = (GridViewPager) findViewById(R.id.pager);
+        // Drawable used to make the UI more captivating
+        mCrossfadeDrawable = new CrossfadeDrawable();
+        mCrossfadeDrawable.setFading(getResources().getDrawable(R.drawable.fading_background));
+        findViewById(android.R.id.content).setBackground(mCrossfadeDrawable);
         // Creating and Setting the Pager adapter
         mAdapter = new BooksGridPagerAdapter(this);
         mViewPager.setAdapter(mAdapter);
         // Connecting the GridViewPager to the indicator
         mPageIndicator.setPager(mViewPager);
+        // Adding the page change listener
+        mViewPager.setOnPageChangeListener(this);
     }
 
     @Override
@@ -108,11 +123,31 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
+        onPageSelected(0, 0);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mAdapter.swapCursor(null);
+    }
+
+    @Override
+    public void onPageScrolled(int row, int column, float rowOffset, float columnOffset, int rowOffsetPixels, int columnOffsetPixels) {
+        mPageIndicator.onPageScrolled(row, column, rowOffset, columnOffset, rowOffsetPixels, columnOffsetPixels);
+    }
+
+    @Override
+    public void onPageSelected(int row, int column) {
+        if (column == 0) {
+            mCrossfadeDrawable.setBase(mAdapter.getBaseDrawable(row));
+        }
+        mCrossfadeDrawable.setProgress(column > 1 ? PARTIAL_FADE : NO_FADE);
+        mPageIndicator.onPageSelected(row, column);
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int state) {
+        mPageIndicator.onPageScrollStateChanged(state);
     }
 
     /**
@@ -171,7 +206,7 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
                     final String notes = mCursor.getString(mCursor.getColumnIndex(Book.NOTES));
                     if (TextUtils.isEmpty(notes)) {
                         // Button to catch a note
-                        return TakeNoteFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
+                        return AddNoteFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
                     } else {
                         return CardFragment.create(mActivity.getString(R.string.notes), notes);
                     }
@@ -198,6 +233,28 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
             mCursor = cursor;
             notifyDataSetChanged();
             return oldCursor;
+        }
+
+        public Drawable getBaseDrawable(int row) {
+            // Positioning the cursor at the right row
+            mCursor.moveToPosition(row);
+            final String tag = mCursor.getString(mCursor.getColumnIndex(Book.TAG));
+            Drawable drawable = null;
+            if (!TextUtils.isEmpty(tag)) {
+                if (tag.equals("android")) {
+                    drawable = mActivity.getResources().getDrawable(R.drawable.tile_android);
+                } else if (tag.equals("javascript")) {
+                    drawable = mActivity.getResources().getDrawable(R.drawable.tile_javascript);
+                } else if (tag.equals("java")) {
+                    drawable = mActivity.getResources().getDrawable(R.drawable.tile_java);
+                } else if (tag.equals("git")) {
+                    drawable = mActivity.getResources().getDrawable(R.drawable.tile_git);
+                }
+            }
+            if (drawable == null) {
+                drawable = mActivity.getResources().getDrawable(R.drawable.tile_android);
+            }
+            return drawable;
         }
     }
 }

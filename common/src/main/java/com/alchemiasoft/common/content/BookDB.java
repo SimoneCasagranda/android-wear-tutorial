@@ -28,7 +28,7 @@ import android.provider.BaseColumns;
 public final class BookDB {
 
     public static final String NAME = "book.db";
-    public static final int VERSION = 4;
+    public static final int VERSION = 5;
 
     public static final String AUTHORITY = "com.alchemiasoft.book.provider";
 
@@ -51,10 +51,11 @@ public final class BookDB {
         public static final String DESCRIPTION = "description";
         public static final String OWNED = "owned";
         public static final String NOTES = "notes";
+        public static final String TAG = "tag";
         public static final String UPDATED_AT = "updated_at";
 
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE + " (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + SERVER_ID + " TEXT NOT NULL, " + TITLE + " TEXT NOT NULL, " + AUTHOR + " TEXT, " + SOURCE + " TEXT, "
+                + SERVER_ID + " TEXT NOT NULL, " + TITLE + " TEXT NOT NULL, " + AUTHOR + " TEXT, " + SOURCE + " TEXT, " + TAG + " TEXT, "
                 + DESCRIPTION + " TEXT, " + PAGES + " INTEGER, " + NOTES + " TEXT, " + UPDATED_AT + " INTEGER, " + OWNED + " BOOLEAN);";
         public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE + ";";
 

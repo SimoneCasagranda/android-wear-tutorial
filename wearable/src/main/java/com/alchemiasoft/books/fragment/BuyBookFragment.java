@@ -84,7 +84,6 @@ public class BuyBookFragment extends Fragment implements DelayedConfirmationView
 
     private boolean mIsAnimating = false;
 
-    @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_buy_book, container, false);

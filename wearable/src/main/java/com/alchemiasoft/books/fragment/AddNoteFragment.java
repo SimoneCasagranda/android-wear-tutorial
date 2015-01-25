@@ -18,13 +18,19 @@ package com.alchemiasoft.books.fragment;
 
 import android.app.Fragment;
 import android.os.Bundle;
+import android.support.wearable.view.DelayedConfirmationView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
+import com.alchemiasoft.books.R;
 
 /**
  * Fragment that allows to add some notes to a book.
  * <p/>
  * Created by Simone Casagranda on 25/01/15.
  */
-public class TakeNoteFragment extends Fragment {
+public class AddNoteFragment extends Fragment implements DelayedConfirmationView.DelayedConfirmationListener {
 
     /**
      * Arguments params.
@@ -47,10 +53,42 @@ public class TakeNoteFragment extends Fragment {
             return builder;
         }
 
-        public TakeNoteFragment build() {
-            final TakeNoteFragment fragment = new TakeNoteFragment();
+        public AddNoteFragment build() {
+            final AddNoteFragment fragment = new AddNoteFragment();
             fragment.setArguments(mArgs);
             return fragment;
         }
+    }
+
+    private DelayedConfirmationView mConfirmationView;
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View view = inflater.inflate(R.layout.fragment_add_note, container, false);
+        mConfirmationView = (DelayedConfirmationView) view.findViewById(R.id.confirm_notes);
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        // The entire "screen" is listening for the click
+        view.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+            }
+        });
+        // Registering the listener triggered by the DelayedConfirmationView
+        mConfirmationView.setListener(this);
+    }
+
+    @Override
+    public void onTimerFinished(View view) {
+
+    }
+
+    @Override
+    public void onTimerSelected(View view) {
+
     }
 }

@@ -22,18 +22,18 @@
     tools:deviceIds="wear">
 
     <android.support.wearable.view.DelayedConfirmationView
-        android:id="@+id/confirm_buy"
+        android:id="@+id/confirm_notes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_action_buy"
+        android:src="@drawable/ic_action_notes"
         android:layout_centerInParent="true"
         style="@style/ActionButton" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/confirm_buy"
+        android:layout_below="@+id/confirm_notes"
         android:layout_centerHorizontal="true"
-        android:text="@string/buy"
+        android:text="@string/add_notes"
         style="@style/TextView.Small.Light.Action" />
 </RelativeLayout>
