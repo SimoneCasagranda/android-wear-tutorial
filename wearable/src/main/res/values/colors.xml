@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright 2015 Simone Casagranda.
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +15,12 @@
   -->
 
 <resources>
-    <dimen name="padding_books_info_square">5dp</dimen>
-    <dimen name="padding_books_info_round">3dp</dimen>
-    <dimen name="margin_bottom_page_indicator">12dp</dimen>
+    <color name="white">#fafafa</color>
+    <color name="gray">#898989</color>
+    <color name="blue_light">#9fd8ff</color>
+    <color name="blue">#00bcd4</color>
+    <color name="blue_dark">#0097a7</color>
+
+    <color name="dot_color">@color/white</color>
+    <color name="dot_color_selected">@color/gray</color>
 </resources>

@@ -25,10 +25,14 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.wearable.view.CardFragment;
+import android.support.wearable.view.DotsPageIndicator;
 import android.support.wearable.view.FragmentGridPagerAdapter;
 import android.support.wearable.view.GridViewPager;
+import android.text.TextUtils;
 
 import com.alchemiasoft.books.R;
+import com.alchemiasoft.books.fragment.BuyBookFragment;
+import com.alchemiasoft.books.fragment.TakeNoteFragment;
 import com.alchemiasoft.common.util.UriUtil;
 
 import static com.alchemiasoft.common.content.BookDB.Book;
@@ -57,6 +61,11 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
     private static final String[] SELECTION_ARGS = {String.valueOf(0)};
     private static final String ORDER_BY = null;
 
+    /**
+     * UI references.
+     */
+    private DotsPageIndicator mPageIndicator;
+
     private GridViewPager mViewPager;
     private BooksGridPagerAdapter mAdapter;
 
@@ -65,10 +74,13 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_books);
         // Getting UI references
+        mPageIndicator = (DotsPageIndicator) findViewById(R.id.pager_indicator);
         mViewPager = (GridViewPager) findViewById(R.id.pager);
         // Creating and Setting the Pager adapter
         mAdapter = new BooksGridPagerAdapter(this);
         mViewPager.setAdapter(mAdapter);
+        // Connecting the GridViewPager to the indicator
+        mPageIndicator.setPager(mViewPager);
     }
 
     @Override
@@ -121,8 +133,11 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
          * Columns
          */
         private static final int TITLE = 0;
-        private static final int DESCRIPTION = 1;
+        private static final int INFO = 1;
         private static final int NOTES = 2;
+        private static final int BUY = 3;
+
+        private static final int COLUMNS = 4;
 
         /**
          * Cursor used as books source.
@@ -149,11 +164,20 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
                     final String title = mCursor.getString(mCursor.getColumnIndex(Book.TITLE));
                     final String author = mCursor.getString(mCursor.getColumnIndex(Book.AUTHOR));
                     return CardFragment.create(title, author);
-                case DESCRIPTION:
+                case INFO:
                     final String description = mCursor.getString(mCursor.getColumnIndex(Book.DESCRIPTION));
                     return CardFragment.create(mActivity.getString(R.string.description), description);
                 case NOTES:
-                    return CardFragment.create("Row:" + row, "Column: " + column);
+                    final String notes = mCursor.getString(mCursor.getColumnIndex(Book.NOTES));
+                    if (TextUtils.isEmpty(notes)) {
+                        // Button to catch a note
+                        return TakeNoteFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
+                    } else {
+                        return CardFragment.create(mActivity.getString(R.string.notes), notes);
+                    }
+                case BUY:
+                    // Button to buy
+                    return BuyBookFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
                 default:
                     throw new IllegalArgumentException("getFragment(row=" + row + ", column=" + column + ")");
             }
@@ -166,7 +190,7 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
 
         @Override
         public int getColumnCount(int row) {
-            return 3;
+            return COLUMNS;
         }
 
         public Cursor swapCursor(Cursor cursor) {

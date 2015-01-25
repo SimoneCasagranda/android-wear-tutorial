@@ -37,6 +37,8 @@
             </intent-filter>
         </activity>
 
+        <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
+
         <provider
             android:authorities="com.alchemiasoft.book.provider"
             android:name="com.alchemiasoft.common.content.BookContentProvider"
