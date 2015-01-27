@@ -96,17 +96,13 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
         mPageIndicator.setPager(mViewPager);
         // Adding the page change listener
         mViewPager.setOnPageChangeListener(this);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
+        // Initializing the loader
         getLoaderManager().initLoader(LOADER_ID_SUGGESTIONS, null, this);
     }
 
     @Override
-    protected void onStop() {
-        super.onStop();
+    protected void onDestroy() {
+        super.onDestroy();
         getLoaderManager().destroyLoader(LOADER_ID_SUGGESTIONS);
     }
 
@@ -123,6 +119,7 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mAdapter.swapCursor(data);
+        mViewPager.setCurrentItem(0, 0);
         onPageSelected(0, 0);
     }
 
@@ -169,8 +166,8 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
          */
         private static final int TITLE = 0;
         private static final int INFO = 1;
-        private static final int BUY = 2;
-        private static final int NOTES = 3;
+        private static final int NOTES = 2;
+        private static final int BUY = 3;
 
         private static final int COLUMNS = 4;
 
@@ -202,9 +199,6 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
                 case INFO:
                     final String description = mCursor.getString(mCursor.getColumnIndex(Book.DESCRIPTION));
                     return CardFragment.create(mActivity.getString(R.string.description), description);
-                case BUY:
-                    // Button to buy
-                    return BuyBookFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
                 case NOTES:
                     final String notes = mCursor.getString(mCursor.getColumnIndex(Book.NOTES));
                     if (TextUtils.isEmpty(notes)) {
@@ -213,6 +207,9 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
                     } else {
                         return CardFragment.create(mActivity.getString(R.string.notes), notes);
                     }
+                case BUY:
+                    // Button to buy
+                    return BuyBookFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
                 default:
                     throw new IllegalArgumentException("getFragment(row=" + row + ", column=" + column + ")");
             }

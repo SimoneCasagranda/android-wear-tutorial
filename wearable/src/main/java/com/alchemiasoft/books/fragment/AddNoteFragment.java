@@ -16,14 +16,26 @@
 
 package com.alchemiasoft.books.fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.support.wearable.view.DelayedConfirmationView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.alchemiasoft.books.R;
+import com.alchemiasoft.common.content.BookDB;
+
+import java.util.List;
 
 /**
  * Fragment that allows to add some notes to a book.
@@ -33,9 +45,24 @@ import com.alchemiasoft.books.R;
 public class AddNoteFragment extends Fragment implements DelayedConfirmationView.DelayedConfirmationListener {
 
     /**
+     * Tag used for logging.
+     */
+    private static final String TAG_LOG = AddNoteFragment.class.getSimpleName();
+
+    /**
      * Arguments params.
      */
     private static final String ARG_ID = "com.alchemiasoft.books.fragment.book.ID";
+
+    /**
+     * Code use to request the free-form speech
+     */
+    private static final int REQUEST_NOTES_CODE = 23;
+
+    /**
+     * Timeout delay for confirmation.
+     */
+    private static final long DELAY_TIMEOUT = 1800L;
 
     /**
      * Allows to build BookInfoCardFragment in an extensible way.
@@ -61,11 +88,15 @@ public class AddNoteFragment extends Fragment implements DelayedConfirmationView
     }
 
     private DelayedConfirmationView mConfirmationView;
+    private TextView mAddNotesTextView;
+
+    private boolean mIsAnimating = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.fragment_add_note, container, false);
         mConfirmationView = (DelayedConfirmationView) view.findViewById(R.id.confirm_notes);
+        mAddNotesTextView = (TextView) view.findViewById(R.id.add_notes_label);
         return view;
     }
 
@@ -76,19 +107,84 @@ public class AddNoteFragment extends Fragment implements DelayedConfirmationView
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (mIsAnimating) {
+                    mConfirmationView.setImageResource(R.drawable.ic_action_notes);
+                    mIsAnimating = false;
+                    return;
+                }
+                final Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+                intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+                intent.putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.what_notes));
+                startActivityForResult(intent, REQUEST_NOTES_CODE);
             }
         });
+        mConfirmationView.setTotalTimeMs(DELAY_TIMEOUT);
         // Registering the listener triggered by the DelayedConfirmationView
         mConfirmationView.setListener(this);
     }
 
     @Override
-    public void onTimerFinished(View view) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (requestCode) {
+            case REQUEST_NOTES_CODE:
+                if (resultCode == Activity.RESULT_OK) {
+                    final List<String> results = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
+                    final String voiceNotes = results.get(0);
+                    mAddNotesTextView.setText(voiceNotes);
+                    mIsAnimating = true;
+                    mConfirmationView.setImageResource(R.drawable.ic_full_cancel);
+                    mConfirmationView.start();
+                }
+                break;
+            default:
+                break;
+        }
+    }
 
+    @Override
+    public void onTimerFinished(View view) {
+        final Activity activity = getActivity();
+        if (activity == null) {
+            Log.e(TAG_LOG, "Fragment not attached anymore to the activity (Skipping action).");
+            return;
+        }
+        // Updating the book state
+        final long bookId = getArguments().getLong(ARG_ID);
+        final AddNotesTask task = new AddNotesTask(getActivity(), bookId, mAddNotesTextView.getText().toString());
+        task.execute();
+        activity.finish();
     }
 
     @Override
     public void onTimerSelected(View view) {
+        mAddNotesTextView.setText(R.string.add_notes);
+        mConfirmationView.reset();
+    }
 
+    /**
+     * AsyncTask that to add the notes to the book.
+     */
+    static final class AddNotesTask extends AsyncTask<Void, Void, Void> {
+
+        private final ContentResolver mResolver;
+
+        private final long mBookId;
+        private final String mNotes;
+
+        AddNotesTask(Context context, long mBookId, String notes) {
+            this.mResolver = context.getContentResolver();
+            this.mBookId = mBookId;
+            this.mNotes = notes;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            final ContentValues values = new ContentValues();
+            values.put(BookDB.Book.NOTES, mNotes);
+            final int count = mResolver.update(BookDB.Book.create(mBookId), values, null, null);
+            Log.d(TAG_LOG, "Add notes to book with id=" + mBookId + (count == 1 ? "[success]" : "[fail]"));
+            return null;
+        }
     }
 }

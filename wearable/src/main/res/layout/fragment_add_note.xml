@@ -30,6 +30,7 @@
         style="@style/ActionButton" />
 
     <TextView
+        android:id="@+id/add_notes_label"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/confirm_notes"
