@@ -138,7 +138,7 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
         if (column == 0) {
             mCrossfadeDrawable.setBase(mAdapter.getBaseDrawable(row));
         }
-        mCrossfadeDrawable.setProgress(column > 1 ? PARTIAL_FADE : NO_FADE);
+        mCrossfadeDrawable.setProgress(mAdapter.isCard(row, column) ? NO_FADE : PARTIAL_FADE);
         mPageIndicator.onPageSelected(row, column);
     }
 
@@ -212,6 +212,18 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
                     return BuyBookFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
                 default:
                     throw new IllegalArgumentException("getFragment(row=" + row + ", column=" + column + ")");
+            }
+        }
+
+        public boolean isCard(int row, int column) {
+            if (column < 2) {
+                return true;
+            } else if (column > 2) {
+                return false;
+            } else {
+                mCursor.moveToPosition(row);
+                final String notes = mCursor.getString(mCursor.getColumnIndex(Book.NOTES));
+                return !(TextUtils.isEmpty(notes));
             }
         }
 

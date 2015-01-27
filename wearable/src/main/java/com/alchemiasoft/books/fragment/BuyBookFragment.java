@@ -50,7 +50,7 @@ public class BuyBookFragment extends Fragment implements DelayedConfirmationView
     /**
      * Timeout delay for confirmation.
      */
-    private static final long DELAY_TIMEOUT = 1800L;
+    private static final long DELAY_TIMEOUT = 2000L;
 
     /**
      * Arguments params.
