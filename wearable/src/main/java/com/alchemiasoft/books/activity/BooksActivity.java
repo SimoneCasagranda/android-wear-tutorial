@@ -35,6 +35,7 @@ import android.text.TextUtils;
 import com.alchemiasoft.books.R;
 import com.alchemiasoft.books.fragment.AddNoteFragment;
 import com.alchemiasoft.books.fragment.BuyBookFragment;
+import com.alchemiasoft.books.fragment.SettingsFragment;
 import com.alchemiasoft.common.util.UriUtil;
 
 import static com.alchemiasoft.common.content.BookDB.Book;
@@ -58,7 +59,7 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
     /**
      * Fading values.
      */
-    private static final float NO_FADE = 0f, PARTIAL_FADE = 0.7f;
+    private static final float NO_FADE = 0f, PARTIAL_FADE = 0.8f;
 
     /**
      * Query params.
@@ -168,8 +169,9 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
         private static final int INFO = 1;
         private static final int NOTES = 2;
         private static final int BUY = 3;
+        private static final int SETTINGS = 4;
 
-        private static final int COLUMNS = 4;
+        private static final int COLUMNS = 5;
 
         /**
          * Cursor used as books source.
@@ -210,6 +212,8 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
                 case BUY:
                     // Button to buy
                     return BuyBookFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
+                case SETTINGS:
+                    return SettingsFragment.Builder.create().build();
                 default:
                     throw new IllegalArgumentException("getFragment(row=" + row + ", column=" + column + ")");
             }
