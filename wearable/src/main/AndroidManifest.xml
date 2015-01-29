@@ -39,6 +39,10 @@
 
         <activity android:name="android.support.wearable.activity.ConfirmationActivity" />
 
+        <service
+            android:name=".service.BookService"
+            android:exported="false" />
+
         <provider
             android:authorities="com.alchemiasoft.book.provider"
             android:name="com.alchemiasoft.common.content.BookContentProvider"

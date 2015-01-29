@@ -18,13 +18,8 @@ package com.alchemiasoft.books.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.wearable.activity.ConfirmationActivity;
 import android.support.wearable.view.DelayedConfirmationView;
 import android.util.Log;
@@ -33,7 +28,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.alchemiasoft.books.R;
-import com.alchemiasoft.common.content.BookDB;
+import com.alchemiasoft.books.service.BookService;
 
 /**
  * Fragment that allows to buy a book.
@@ -123,8 +118,7 @@ public class BuyBookFragment extends Fragment implements DelayedConfirmationView
         }
         // Updating the book state
         final long bookId = getArguments().getLong(ARG_ID);
-        final PurchaseBookTask task = new PurchaseBookTask(activity, bookId);
-        task.execute();
+        BookService.Invoker.get(activity).bookId(bookId).owned(true).invoke();
         // Starting the confirmation screen
         Intent intent = new Intent(activity, ConfirmationActivity.class);
         intent.putExtra(ConfirmationActivity.EXTRA_ANIMATION_TYPE, ConfirmationActivity.SUCCESS_ANIMATION);
@@ -136,29 +130,5 @@ public class BuyBookFragment extends Fragment implements DelayedConfirmationView
     @Override
     public void onTimerSelected(View view) {
         mConfirmationView.reset();
-    }
-
-    /**
-     * AsyncTask that perform the purchase action on the book.
-     */
-    static final class PurchaseBookTask extends AsyncTask<Void, Void, Void> {
-
-        private final ContentResolver mResolver;
-
-        private final long mBookId;
-
-        PurchaseBookTask(Context context, long mBookId) {
-            this.mResolver = context.getContentResolver();
-            this.mBookId = mBookId;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            final ContentValues values = new ContentValues();
-            values.put(BookDB.Book.OWNED, 1);
-            final int count = mResolver.update(BookDB.Book.create(mBookId), values, null, null);
-            Log.d(TAG_LOG, "Book purchase with id=" + mBookId + (count == 1 ? "[success]" : "[fail]"));
-            return null;
-        }
     }
 }

@@ -18,11 +18,7 @@ package com.alchemiasoft.books.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.support.wearable.view.DelayedConfirmationView;
@@ -33,7 +29,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.alchemiasoft.books.R;
-import com.alchemiasoft.common.content.BookDB;
+import com.alchemiasoft.books.service.BookService;
 
 import java.util.List;
 
@@ -151,8 +147,10 @@ public class AddNoteFragment extends Fragment implements DelayedConfirmationView
         }
         // Updating the book state
         final long bookId = getArguments().getLong(ARG_ID);
-        final AddNotesTask task = new AddNotesTask(getActivity(), bookId, mAddNotesTextView.getText().toString());
-        task.execute();
+        final String notes = mAddNotesTextView.getText().toString();
+        // Scheduling the job in on the BookService
+        BookService.Invoker.get(activity).bookId(bookId).notes(notes).invoke();
+        // We want to close the wear app
         activity.finish();
     }
 
@@ -160,31 +158,5 @@ public class AddNoteFragment extends Fragment implements DelayedConfirmationView
     public void onTimerSelected(View view) {
         mAddNotesTextView.setText(R.string.add_notes);
         mConfirmationView.reset();
-    }
-
-    /**
-     * AsyncTask that to add the notes to the book.
-     */
-    static final class AddNotesTask extends AsyncTask<Void, Void, Void> {
-
-        private final ContentResolver mResolver;
-
-        private final long mBookId;
-        private final String mNotes;
-
-        AddNotesTask(Context context, long mBookId, String notes) {
-            this.mResolver = context.getContentResolver();
-            this.mBookId = mBookId;
-            this.mNotes = notes;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            final ContentValues values = new ContentValues();
-            values.put(BookDB.Book.NOTES, mNotes);
-            final int count = mResolver.update(BookDB.Book.create(mBookId), values, null, null);
-            Log.d(TAG_LOG, "Add notes to book with id=" + mBookId + (count == 1 ? "[success]" : "[fail]"));
-            return null;
-        }
     }
 }

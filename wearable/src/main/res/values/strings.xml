@@ -26,5 +26,6 @@
     <string name="item_purchased">Purchased</string>
     <string name="add_notes">Add notes</string>
     <string name="what_notes">What notes?</string>
+    <string name="not_yet_implemented">Not yet implemented.</string>
 
 </resources>

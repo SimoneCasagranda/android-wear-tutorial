@@ -16,6 +16,7 @@
 
 package com.alchemiasoft.books.fragment;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.wearable.view.WearableListView;
@@ -23,8 +24,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.alchemiasoft.books.R;
+import com.alchemiasoft.books.service.BookService;
+import com.alchemiasoft.common.content.BookDB;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,8 +41,16 @@ import java.util.List;
  */
 public class SettingsFragment extends Fragment implements WearableListView.ClickListener {
 
-    private static final String[] DATA = {};
+    /**
+     * DB Query params.
+     */
+    private static final String WHERE_OWNED = BookDB.Book.OWNED + " = ?";
+    private static final String OWNED = String.valueOf(1);
+    private static final String NOT_OWNED = String.valueOf(0);
 
+    /**
+     * Builder for the SettingsFragment.
+     */
     public static final class Builder {
 
         private final Bundle mArgs = new Bundle();
@@ -70,17 +82,39 @@ public class SettingsFragment extends Fragment implements WearableListView.Click
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        // Used to allow the WearableListView to intercept all the touches
+        // preventing the parent to handle them
         mWearableListView.setGreedyTouchMode(true);
-        mAdapter = new Adapter(DATA);
+        // Creating and setting the adapter used to show the available settings
+        final String[] settings = getResources().getStringArray(R.array.settings);
+        mAdapter = new Adapter(settings);
         mWearableListView.setAdapter(mAdapter);
         mWearableListView.setClickListener(this);
     }
 
     @Override
     public void onClick(WearableListView.ViewHolder viewHolder) {
+        final Activity activity = getActivity();
         final int position = viewHolder.getPosition();
         switch (position) {
-            // TODO: implement click handling
+            case 0:
+                // Sell all the owned books
+                BookService.Invoker.get(activity).where(WHERE_OWNED, OWNED).owned(false).invoke();
+                activity.finish();
+                break;
+            case 1:
+                // Buy all the available books
+                BookService.Invoker.get(activity).where(WHERE_OWNED, NOT_OWNED).owned(true).invoke();
+                activity.finish();
+                break;
+            case 2:
+                // Resetting the DB
+                BookService.Invoker.get(activity).notes(null).owned(false).invoke();
+                activity.finish();
+                break;
+            default:
+                Toast.makeText(activity, activity.getString(R.string.not_yet_implemented), Toast.LENGTH_SHORT).show();
+                break;
         }
     }
 

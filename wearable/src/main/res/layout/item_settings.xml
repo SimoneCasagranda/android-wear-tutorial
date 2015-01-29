@@ -19,4 +19,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
-    style="@style/TextView.Small.Light.Action" />
+    style="@style/TextView.Small.Light.Action"
+    android:paddingLeft="@dimen/padding_item_settings"
+    android:paddingRight="@dimen/padding_item_settings"
+    android:ellipsize="end" />
