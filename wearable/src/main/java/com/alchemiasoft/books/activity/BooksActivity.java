@@ -35,6 +35,7 @@ import android.text.TextUtils;
 import com.alchemiasoft.books.R;
 import com.alchemiasoft.books.fragment.AddNoteFragment;
 import com.alchemiasoft.books.fragment.BuyBookFragment;
+import com.alchemiasoft.books.fragment.InfoFragment;
 import com.alchemiasoft.books.fragment.SettingsFragment;
 import com.alchemiasoft.common.util.UriUtil;
 
@@ -163,7 +164,7 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
     private static final class BooksGridPagerAdapter extends FragmentGridPagerAdapter {
 
         /**
-         * Columns
+         * Columns for valid cursor.
          */
         private static final int TITLE = 0;
         private static final int INFO = 1;
@@ -172,6 +173,15 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
         private static final int SETTINGS = 4;
 
         private static final int COLUMNS = 5;
+
+        /**
+         * Columns for empty.
+         */
+        private static final int EMPTY_INFO = 0;
+        private static final int EMPTY_SETTINGS = 1;
+
+        private static final int EMPTY_ROW_COUNT = 1;
+        private static final int EMPTY_COLUMN_COUNT = 2;
 
         /**
          * Cursor used as books source.
@@ -190,36 +200,51 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
 
         @Override
         public Fragment getFragment(int row, int column) {
-            // Positioning the cursor at the right row
-            mCursor.moveToPosition(row);
-            // Matching the fragment by column
-            switch (column) {
-                case TITLE:
-                    final String title = mCursor.getString(mCursor.getColumnIndex(Book.TITLE));
-                    final String author = mCursor.getString(mCursor.getColumnIndex(Book.AUTHOR));
-                    return CardFragment.create(title, author);
-                case INFO:
-                    final String description = mCursor.getString(mCursor.getColumnIndex(Book.DESCRIPTION));
-                    return CardFragment.create(mActivity.getString(R.string.description), description);
-                case NOTES:
-                    final String notes = mCursor.getString(mCursor.getColumnIndex(Book.NOTES));
-                    if (TextUtils.isEmpty(notes)) {
-                        // Button to catch a note
-                        return AddNoteFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
-                    } else {
-                        return CardFragment.create(mActivity.getString(R.string.notes), notes);
-                    }
-                case BUY:
-                    // Button to buy
-                    return BuyBookFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
-                case SETTINGS:
-                    return SettingsFragment.Builder.create().build();
-                default:
-                    throw new IllegalArgumentException("getFragment(row=" + row + ", column=" + column + ")");
+            // Checking if it's empty
+            if (isEmpty()) {
+                switch (column) {
+                    case EMPTY_INFO:
+                        return InfoFragment.Builder.create(R.string.no_suggestions).build();
+                    case EMPTY_SETTINGS:
+                        return SettingsFragment.Builder.create().build();
+                    default:
+                        throw new IllegalArgumentException("getFragment(row=" + row + ", column=" + column + ")");
+                }
+            } else {
+                // Positioning the cursor at the right row
+                mCursor.moveToPosition(row);
+                // Matching the fragment by column
+                switch (column) {
+                    case TITLE:
+                        final String title = mCursor.getString(mCursor.getColumnIndex(Book.TITLE));
+                        final String author = mCursor.getString(mCursor.getColumnIndex(Book.AUTHOR));
+                        return CardFragment.create(title, author);
+                    case INFO:
+                        final String description = mCursor.getString(mCursor.getColumnIndex(Book.DESCRIPTION));
+                        return CardFragment.create(mActivity.getString(R.string.description), description);
+                    case NOTES:
+                        final String notes = mCursor.getString(mCursor.getColumnIndex(Book.NOTES));
+                        if (TextUtils.isEmpty(notes)) {
+                            // Button to catch a note
+                            return AddNoteFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
+                        } else {
+                            return CardFragment.create(mActivity.getString(R.string.notes), notes);
+                        }
+                    case BUY:
+                        // Button to buy
+                        return BuyBookFragment.Builder.create(mCursor.getLong(mCursor.getColumnIndex(Book._ID))).build();
+                    case SETTINGS:
+                        return SettingsFragment.Builder.create().build();
+                    default:
+                        throw new IllegalArgumentException("getFragment(row=" + row + ", column=" + column + ")");
+                }
             }
         }
 
         public boolean isCard(int row, int column) {
+            if (isEmpty()) {
+                return false;
+            }
             if (column < 2) {
                 return true;
             } else if (column > 2) {
@@ -233,12 +258,12 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
 
         @Override
         public int getRowCount() {
-            return mCursor == null ? 0 : mCursor.getCount();
+            return isEmpty() ? EMPTY_ROW_COUNT : mCursor.getCount();
         }
 
         @Override
         public int getColumnCount(int row) {
-            return COLUMNS;
+            return isEmpty() ? EMPTY_COLUMN_COUNT : COLUMNS;
         }
 
         public Cursor swapCursor(Cursor cursor) {
@@ -248,7 +273,14 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
             return oldCursor;
         }
 
+        public boolean isEmpty() {
+            return mCursor == null || mCursor.getCount() == 0;
+        }
+
         public Drawable getBaseDrawable(int row) {
+            if (isEmpty()) {
+                return mActivity.getResources().getDrawable(R.drawable.tile_sad);
+            }
             // Positioning the cursor at the right row
             mCursor.moveToPosition(row);
             final String tag = mCursor.getString(mCursor.getColumnIndex(Book.TAG));

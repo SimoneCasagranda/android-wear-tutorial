@@ -13,13 +13,13 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-
-<com.alchemiasoft.books.widget.WearableListTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/text"
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:gravity="center_vertical"
+    android:gravity="center"
+    tools:text="@string/unknown"
     style="@style/TextView.Medium.Light.Action"
-    android:paddingLeft="@dimen/padding_item_settings"
-    android:paddingRight="@dimen/padding_item_settings"
-    android:ellipsize="end" />
+    tools:context=".Books"
+    tools:deviceIds="wear" />

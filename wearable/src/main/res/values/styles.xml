@@ -20,6 +20,10 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="TextView.Medium.Light.Action">
+        <item name="android:textColor">@color/white</item>
+    </style>
+
     <style name="ActionButton">
         <item name="circle_border_color">@color/blue_light</item>
         <item name="circle_border_width">@dimen/circle_border_width</item>
