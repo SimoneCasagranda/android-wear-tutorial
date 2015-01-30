@@ -27,5 +27,7 @@
     <string name="add_notes">Add notes</string>
     <string name="what_notes">What notes?</string>
     <string name="not_yet_implemented">Not yet implemented.</string>
+    <string name="unknown">Unknown</string>
+    <string name="no_suggestions">No suggestions found</string>
 
 </resources>
