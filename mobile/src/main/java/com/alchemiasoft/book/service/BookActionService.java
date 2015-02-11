@@ -190,6 +190,7 @@ public class BookActionService extends IntentService {
             final Action action = Action.valueOf(intent.getAction());
             Log.d(TAG_LOG, "Performing action=" + action + " on book with id=" + bookId);
             final ContentValues cv = new ContentValues();
+            cv.put(BookDB.Book.UPDATED_AT, System.currentTimeMillis());
             final Uri uri = BookDB.Book.create(bookId);
             switch (action) {
                 case BUY:
