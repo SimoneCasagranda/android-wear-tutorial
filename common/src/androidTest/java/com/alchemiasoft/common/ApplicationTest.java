@@ -17,6 +17,7 @@
 package com.alchemiasoft.common;
 
 import android.app.Application;
+import android.net.Uri;
 import android.test.ApplicationTestCase;
 
 /**
@@ -25,5 +26,11 @@ import android.test.ApplicationTestCase;
 public class ApplicationTest extends ApplicationTestCase<Application> {
     public ApplicationTest() {
         super(Application.class);
+    }
+
+    public void testUri(){
+        final Uri uri = Uri.parse("content://com.alchemiasoft.book.provider/book");
+        final String path = uri.getPath();
+        final String recompose = "content://com.alchemiasoft.book.provider"+path;
     }
 }
