@@ -25,6 +25,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -38,6 +39,13 @@ import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.activity.HomeActivity;
 import com.alchemiasoft.common.content.BookDB;
 import com.alchemiasoft.common.model.Book;
+import com.alchemiasoft.common.sync.Event;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Wearable;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Service that allows to buy
@@ -52,6 +60,11 @@ public class BookActionService extends IntentService {
     private static final String TAG_LOG = BookActionService.class.getSimpleName();
 
     private static final int NOTIFICATION_ID = 37;
+
+    /**
+     * Timeout for the GooglePlayClient connection in milliseconds.
+     */
+    private static final long GOOGLE_PLAY_TIMEOUT = 2000L;
 
     /**
      * Available params.
@@ -140,8 +153,27 @@ public class BookActionService extends IntentService {
 
     }
 
+    private GoogleApiClient mGoogleApiClient;
+
     public BookActionService() {
         super(TAG_LOG);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Always disconnect the client
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
     }
 
     @Override
@@ -158,10 +190,11 @@ public class BookActionService extends IntentService {
             final Action action = Action.valueOf(intent.getAction());
             Log.d(TAG_LOG, "Performing action=" + action + " on book with id=" + bookId);
             final ContentValues cv = new ContentValues();
+            final Uri uri = BookDB.Book.create(bookId);
             switch (action) {
                 case BUY:
                     cv.put(BookDB.Book.OWNED, 1);
-                    if (cr.update(BookDB.Book.create(bookId), cv, null, null) == 1 && intent.getBooleanExtra(EXTRA_WEARABLE_INPUT, false)) {
+                    if (cr.update(uri, cv, null, null) == 1 && intent.getBooleanExtra(EXTRA_WEARABLE_INPUT, false)) {
                         final Book book = getBook(bookId);
                         if (book != null) {
                             final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
@@ -180,10 +213,12 @@ public class BookActionService extends IntentService {
                             NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, builder.build());
                         }
                     }
+                    // We want to sync with the wearable
+                    trySyncWithWearable(uri, cv);
                     break;
                 case SELL:
                     cv.put(BookDB.Book.OWNED, 0);
-                    if (cr.update(BookDB.Book.create(bookId), cv, null, null) == 1 && intent.getBooleanExtra(EXTRA_WEARABLE_INPUT, false)) {
+                    if (cr.update(uri, cv, null, null) == 1 && intent.getBooleanExtra(EXTRA_WEARABLE_INPUT, false)) {
                         final Book book = getBook(bookId);
                         if (book != null) {
                             final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
@@ -193,17 +228,33 @@ public class BookActionService extends IntentService {
                             NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, builder.build());
                         }
                     }
+                    // We want to sync with the wearable
+                    trySyncWithWearable(uri, cv);
                     break;
                 case ADD_NOTE:
                     final CharSequence notes = getExtraNotes(intent);
                     if (!TextUtils.isEmpty(notes)) {
                         cv.put(BookDB.Book.NOTES, notes.toString());
-                        cr.update(BookDB.Book.create(bookId), cv, null, null);
+                        cr.update(uri, cv, null, null);
+                        // We want to sync with the wearable
+                        trySyncWithWearable(uri, cv);
                     }
                     break;
                 default:
                     break;
             }
+        }
+    }
+
+    private void trySyncWithWearable(final Uri uri, ContentValues cv) {
+        if (mGoogleApiClient != null) {
+            if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.blockingConnect(GOOGLE_PLAY_TIMEOUT, TimeUnit.MILLISECONDS).isSuccess()) {
+                Log.e(TAG_LOG, "Cannot connect to GoogleApiClient.");
+                return;
+            }
+            Wearable.DataApi.putDataItem(mGoogleApiClient, Event.DataApi.Builder.create(uri, cv).asRequest());
+        } else {
+            Log.e(TAG_LOG, "GoogleApiClient not available.");
         }
     }
 
