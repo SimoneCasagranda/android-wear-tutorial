@@ -86,7 +86,7 @@ public final class Event {
 
             public Uri uri() {
                 // Readability versus efficiency (this is a tutorial not production code)
-                return Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + BookDB.CONTENT_SCHEME + mUri.getPath());
+                return Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + BookDB.AUTHORITY + mUri.getPath());
             }
 
             public ContentValues values() {

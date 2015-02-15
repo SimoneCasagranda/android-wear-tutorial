@@ -26,7 +26,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.net.Uri;
+import android.text.TextUtils;
 
+import com.alchemiasoft.common.util.ArraysUtil;
 import com.alchemiasoft.common.util.UriUtil;
 
 import java.util.ArrayList;
@@ -70,8 +72,13 @@ public class BookContentProvider extends ContentProvider {
         Cursor cursor;
         switch (code) {
             case 0:
-                selection = BookDB.Book._ID + " = ?";
-                selectionArgs = new String[]{uri.getLastPathSegment()};
+                if (TextUtils.isEmpty(selection)) {
+                    selection = BookDB.Book._ID + " = ?";
+                    selectionArgs = new String[]{uri.getLastPathSegment()};
+                } else {
+                    selection = BookDB.Book._ID + " = ? AND (" + selection + ")";
+                    selectionArgs = ArraysUtil.concatenate(new String[]{uri.getLastPathSegment()}, selectionArgs);
+                }
                 cursor = mDbHelper.getWritableDatabase().query(BookDB.Book.TABLE, projection, selection, selectionArgs, null, null, null, limit);
                 break;
             case 1:
@@ -103,8 +110,13 @@ public class BookContentProvider extends ContentProvider {
         int result;
         switch (code) {
             case 0:
-                selection = BookDB.Book._ID + " = ?";
-                selectionArgs = new String[]{uri.getLastPathSegment()};
+                if (TextUtils.isEmpty(selection)) {
+                    selection = BookDB.Book._ID + " = ?";
+                    selectionArgs = new String[]{uri.getLastPathSegment()};
+                } else {
+                    selection = BookDB.Book._ID + " = ? AND (" + selection + ")";
+                    selectionArgs = ArraysUtil.concatenate(new String[]{uri.getLastPathSegment()}, selectionArgs);
+                }
                 result = mDbHelper.getWritableDatabase().delete(BookDB.Book.TABLE, selection, selectionArgs);
                 break;
             case 1:
@@ -125,8 +137,13 @@ public class BookContentProvider extends ContentProvider {
         int result;
         switch (code) {
             case 0:
-                selection = BookDB.Book._ID + " = ?";
-                selectionArgs = new String[]{uri.getLastPathSegment()};
+                if (TextUtils.isEmpty(selection)) {
+                    selection = BookDB.Book._ID + " = ?";
+                    selectionArgs = new String[]{uri.getLastPathSegment()};
+                } else {
+                    selection = BookDB.Book._ID + " = ? AND (" + selection + ")";
+                    selectionArgs = ArraysUtil.concatenate(new String[]{uri.getLastPathSegment()}, selectionArgs);
+                }
                 if (!values.containsKey(BookDB.Book.UPDATED_AT)) {
                     values.put(BookDB.Book.UPDATED_AT, System.currentTimeMillis());
                 }
