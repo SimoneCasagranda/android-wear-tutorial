@@ -56,6 +56,7 @@ public class BooksSyncService extends WearableListenerService {
         for (DataEvent event : events) {
             if (event.getType() == DataEvent.TYPE_CHANGED) {
                 final Event.DataApi.Item item = Event.DataApi.Item.from(event.getDataItem());
+                // TODO extract and append where/whereArgs
                 getContentResolver().update(item.uri(), item.values(), WHERE_BEFORE, new String[]{String.valueOf(item.time())});
             }
         }

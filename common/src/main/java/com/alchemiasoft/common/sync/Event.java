@@ -21,6 +21,7 @@ import android.content.ContentValues;
 import android.net.Uri;
 
 import com.alchemiasoft.common.content.BookDB;
+import com.alchemiasoft.common.util.UriUtil;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
@@ -39,7 +40,7 @@ public final class Event {
 
         public static final class Builder {
 
-            private final Uri mUri;
+            private Uri mUri;
             private final ContentValues mValues;
 
             private Builder(Uri uri, ContentValues values) {
@@ -49,6 +50,12 @@ public final class Event {
 
             public static Builder create(Uri uri, ContentValues values) {
                 return new Builder(uri, values);
+            }
+
+            public Builder where(String where, String... args) {
+                mUri = UriUtil.withWhere(mUri, where);
+                mUri = UriUtil.withWhereArgs(mUri, args);
+                return this;
             }
 
             public PutDataRequest asRequest() {

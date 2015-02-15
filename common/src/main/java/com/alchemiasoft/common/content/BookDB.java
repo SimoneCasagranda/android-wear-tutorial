@@ -56,7 +56,7 @@ public final class BookDB {
 
         public static final String CREATE_TABLE = "CREATE TABLE " + TABLE + " (_id INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + SERVER_ID + " TEXT NOT NULL, " + TITLE + " TEXT NOT NULL, " + AUTHOR + " TEXT, " + SOURCE + " TEXT, " + TAG + " TEXT, "
-                + DESCRIPTION + " TEXT, " + PAGES + " INTEGER, " + NOTES + " TEXT, " + UPDATED_AT + " INTEGER, " + OWNED + " BOOLEAN);";
+                + DESCRIPTION + " TEXT, " + PAGES + " INTEGER, " + NOTES + " TEXT, " + UPDATED_AT + " INTEGER DEFAULT 0, " + OWNED + " BOOLEAN);";
         public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE + ";";
 
 

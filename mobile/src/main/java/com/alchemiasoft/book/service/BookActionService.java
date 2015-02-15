@@ -215,7 +215,7 @@ public class BookActionService extends IntentService {
                         }
                     }
                     // We want to sync with the wearable
-                    trySyncWithWearable(uri, cv);
+                    trySyncDataWithWearableLayer(uri, cv);
                     break;
                 case SELL:
                     cv.put(BookDB.Book.OWNED, 0);
@@ -230,7 +230,7 @@ public class BookActionService extends IntentService {
                         }
                     }
                     // We want to sync with the wearable
-                    trySyncWithWearable(uri, cv);
+                    trySyncDataWithWearableLayer(uri, cv);
                     break;
                 case ADD_NOTE:
                     final CharSequence notes = getExtraNotes(intent);
@@ -238,7 +238,7 @@ public class BookActionService extends IntentService {
                         cv.put(BookDB.Book.NOTES, notes.toString());
                         cr.update(uri, cv, null, null);
                         // We want to sync with the wearable
-                        trySyncWithWearable(uri, cv);
+                        trySyncDataWithWearableLayer(uri, cv);
                     }
                     break;
                 default:
@@ -247,13 +247,13 @@ public class BookActionService extends IntentService {
         }
     }
 
-    private void trySyncWithWearable(final Uri uri, ContentValues cv) {
+    private void trySyncDataWithWearableLayer(final Uri uri, ContentValues data) {
         if (mGoogleApiClient != null) {
             if (!mGoogleApiClient.isConnected() && !mGoogleApiClient.blockingConnect(GOOGLE_PLAY_TIMEOUT, TimeUnit.MILLISECONDS).isSuccess()) {
                 Log.e(TAG_LOG, "Cannot connect to GoogleApiClient.");
                 return;
             }
-            Wearable.DataApi.putDataItem(mGoogleApiClient, Event.DataApi.Builder.create(uri, cv).asRequest());
+            Wearable.DataApi.putDataItem(mGoogleApiClient, Event.DataApi.Builder.create(uri, data).asRequest());
         } else {
             Log.e(TAG_LOG, "GoogleApiClient not available.");
         }
