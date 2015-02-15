@@ -28,7 +28,7 @@ import android.provider.BaseColumns;
 public final class BookDB {
 
     public static final String NAME = "book.db";
-    public static final int VERSION = 5;
+    public static final int VERSION = 6;
 
     public static final String AUTHORITY = "com.alchemiasoft.book.provider";
 
