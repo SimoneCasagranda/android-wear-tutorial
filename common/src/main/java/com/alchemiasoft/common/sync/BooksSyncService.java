@@ -16,14 +16,18 @@
 
 package com.alchemiasoft.common.sync;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.alchemiasoft.common.content.BookDB;
+import com.alchemiasoft.common.util.ArraysUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.data.FreezableUtils;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
+import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.List;
@@ -55,9 +59,23 @@ public class BooksSyncService extends WearableListenerService {
         // Running through all the events
         for (DataEvent event : events) {
             if (event.getType() == DataEvent.TYPE_CHANGED) {
+                // Checking if it's the same node that has fired the event
+                final String node = event.getDataItem().getUri().getHost();
+                final String localNode = getLocalNode().getId();
+                if (node.equals(localNode)) {
+                    Log.d(TAG_LOG, "Skipping Event because fired from the same receiver.");
+                }
                 final Event.DataApi.Item item = Event.DataApi.Item.from(event.getDataItem());
-                // TODO extract and append where/whereArgs
-                getContentResolver().update(item.uri(), item.values(), WHERE_BEFORE, new String[]{String.valueOf(item.time())});
+                String where = item.where();
+                String[] whereArgs = item.whereArgs();
+                if (TextUtils.isEmpty(where)) {
+                    where = WHERE_BEFORE;
+                    whereArgs = new String[]{String.valueOf(item.time())};
+                } else {
+                    where = "(" + where + ") AND " + WHERE_BEFORE;
+                    whereArgs = ArraysUtil.concatenate(whereArgs, new String[]{String.valueOf(item.time())});
+                }
+                getContentResolver().update(item.uri(), item.values(), where, whereArgs);
             }
         }
     }
@@ -78,5 +96,15 @@ public class BooksSyncService extends WearableListenerService {
     public void onPeerDisconnected(Node peer) {
         super.onPeerDisconnected(peer);
         Log.d(TAG_LOG, "onPeerDisconnected(peer=" + peer.getId() + "|" + peer.getDisplayName() + ")");
+    }
+
+    private Node getLocalNode() {
+        final GoogleApiClient client = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
+        try {
+            client.blockingConnect();
+            return Wearable.NodeApi.getLocalNode(client).await().getNode();
+        } finally {
+            client.disconnect();
+        }
     }
 }

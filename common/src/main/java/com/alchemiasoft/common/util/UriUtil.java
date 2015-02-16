@@ -21,6 +21,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
+import java.util.List;
+
 /**
  * Utility used to interact with and manipulate Uri(s).
  * <p/>
@@ -141,6 +143,8 @@ public final class UriUtil {
      * @return an array containing the encountered arguments.
      */
     public static String[] getWhereArgs(@NonNull Uri uri) {
-        return (String[]) uri.getQueryParameters(KEY_WHERE_ARG).toArray();
+        final List<String> queryParams = uri.getQueryParameters(KEY_WHERE_ARG);
+        final String[] result = new String[queryParams.size()];
+        return queryParams.toArray(result);
     }
 }

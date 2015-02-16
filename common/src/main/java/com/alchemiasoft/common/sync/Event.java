@@ -81,10 +81,14 @@ public final class Event {
 
             private final DataMap mDataMap;
             private final Uri mUri;
+            private final String mWhere;
+            private final String[] mWhereArgs;
 
             private Item(DataItem item) {
                 mDataMap = DataMapItem.fromDataItem(item).getDataMap();
                 mUri = item.getUri();
+                mWhere = UriUtil.getWhere(mUri);
+                mWhereArgs = UriUtil.getWhereArgs(mUri);
             }
 
             public static Item from(DataItem item) {
@@ -94,6 +98,14 @@ public final class Event {
             public Uri uri() {
                 // Readability versus efficiency (this is a tutorial not production code)
                 return Uri.parse(ContentResolver.SCHEME_CONTENT + "://" + BookDB.AUTHORITY + mUri.getPath());
+            }
+
+            public String where() {
+                return mWhere;
+            }
+
+            public String[] whereArgs() {
+                return mWhereArgs;
             }
 
             public ContentValues values() {
