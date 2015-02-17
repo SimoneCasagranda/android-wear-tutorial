@@ -132,7 +132,5 @@ public final class Event {
     }
 
     public static final class MessageApi {
-
     }
-
 }

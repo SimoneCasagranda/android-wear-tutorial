@@ -112,9 +112,6 @@ public class SettingsFragment extends Fragment implements WearableListView.Click
                 BookService.Invoker.get(activity).notes(null).owned(false).invoke();
                 activity.finish();
                 break;
-            default:
-                Toast.makeText(activity, activity.getString(R.string.not_yet_implemented), Toast.LENGTH_SHORT).show();
-                break;
         }
     }
 

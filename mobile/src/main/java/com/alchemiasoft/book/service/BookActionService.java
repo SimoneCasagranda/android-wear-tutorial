@@ -48,7 +48,7 @@ import com.google.android.gms.wearable.Wearable;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Service that allows to buy
+ * Service that allows to perform actions like purchase, sell and annotate books.
  * <p/>
  * Created by Simone Casagranda on 28/12/14.
  */

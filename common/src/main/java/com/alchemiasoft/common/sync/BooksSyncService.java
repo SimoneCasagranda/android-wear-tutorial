@@ -21,13 +21,12 @@ import android.util.Log;
 
 import com.alchemiasoft.common.content.BookDB;
 import com.alchemiasoft.common.util.ArraysUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
+import com.alchemiasoft.common.util.WearableUtil;
 import com.google.android.gms.common.data.FreezableUtils;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
-import com.google.android.gms.wearable.Wearable;
 import com.google.android.gms.wearable.WearableListenerService;
 
 import java.util.List;
@@ -61,7 +60,7 @@ public class BooksSyncService extends WearableListenerService {
             if (event.getType() == DataEvent.TYPE_CHANGED) {
                 // Checking if it's the same node that has fired the event
                 final String node = event.getDataItem().getUri().getHost();
-                final String localNode = getLocalNode().getId();
+                final String localNode = WearableUtil.getLocalNode(this).getId();
                 if (node.equals(localNode)) {
                     Log.d(TAG_LOG, "Skipping Event because fired from the same receiver.");
                 }
@@ -96,15 +95,5 @@ public class BooksSyncService extends WearableListenerService {
     public void onPeerDisconnected(Node peer) {
         super.onPeerDisconnected(peer);
         Log.d(TAG_LOG, "onPeerDisconnected(peer=" + peer.getId() + "|" + peer.getDisplayName() + ")");
-    }
-
-    private Node getLocalNode() {
-        final GoogleApiClient client = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
-        try {
-            client.blockingConnect();
-            return Wearable.NodeApi.getLocalNode(client).await().getNode();
-        } finally {
-            client.disconnect();
-        }
     }
 }

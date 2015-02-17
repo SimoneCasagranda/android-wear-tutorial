@@ -20,6 +20,5 @@
         <item>Sell owned</item>
         <item>Buy all available</item>
         <item>Reset DB</item>
-        <item>Force DB sync</item>
     </string-array>
 </resources>
