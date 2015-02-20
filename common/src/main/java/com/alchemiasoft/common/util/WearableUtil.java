@@ -22,6 +22,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.Wearable;
 
+import java.util.List;
+
 /**
  * Class that can be used to interact with the Wearable api(s).
  * <p/>
@@ -61,4 +63,15 @@ public class WearableUtil {
         return Wearable.NodeApi.getLocalNode(client).await().getNode();
     }
 
+    /**
+     * Allows to get a connected node at a particular position.
+     *
+     * @param client used to access the Wearable layer.
+     * @param pos    that has to be matched.
+     * @return the found node or null.
+     */
+    public static Node getConnectedNoteAt(GoogleApiClient client, int pos) {
+        final List<Node> nodes = Wearable.NodeApi.getConnectedNodes(client).await().getNodes();
+        return pos >= nodes.size() ? null : nodes.get(pos);
+    }
 }

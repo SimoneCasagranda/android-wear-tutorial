@@ -30,15 +30,22 @@ import android.widget.Toast;
 import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.fragment.BookDetailFragment;
 import com.alchemiasoft.book.fragment.BooksFragment;
-import com.alchemiasoft.common.model.Book;
 import com.alchemiasoft.book.receiver.SuggestionReceiver;
+import com.alchemiasoft.common.model.Book;
+import com.alchemiasoft.common.sync.Event;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Wearable;
 
 /**
  * Activity that decides weather to display available books or owned books.
  * <p/>
  * Created by Simone Casagranda on 20/12/14.
  */
-public class HomeActivity extends ActionBarActivity {
+public class HomeActivity extends ActionBarActivity implements MessageApi.MessageListener, GoogleApiClient.ConnectionCallbacks {
 
     /**
      * Tag used for logging purposes.
@@ -69,6 +76,8 @@ public class HomeActivity extends ActionBarActivity {
         intent.putExtra(KEY_BOOK_ID, book.getId());
         return intent;
     }
+
+    private GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -111,6 +120,49 @@ public class HomeActivity extends ActionBarActivity {
         // Checking if first instance and then attach the first fragment
         if (savedInstanceState == null) {
             attachBookFragment(getIntent().getLongExtra(KEY_BOOK_ID, NOT_VALID));
+        }
+        // Creating the GoogleApiClient for the Wearable api (if available)
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addApi(Wearable.API).build();
+        }
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Trying to bind to the GoogleApiClient
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Disconnecting the client and releasing the wearable updates
+        if (mGoogleApiClient != null) {
+            Wearable.MessageApi.removeListener(mGoogleApiClient, this);
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        // The Client is connected => we can register for the wearable updates
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
+    }
+
+    @Override
+    public void onConnectionSuspended(int cause) {
+    }
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        final Event.MessageApi.Receiver receiver = Event.MessageApi.Receiver.from(messageEvent);
+        switch (receiver.action()) {
+            case Event.MessageApi.OPEN:
+                attachBookFragment(receiver.bookId());
+                break;
         }
     }
 

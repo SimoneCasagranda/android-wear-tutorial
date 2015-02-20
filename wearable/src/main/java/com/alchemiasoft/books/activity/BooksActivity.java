@@ -37,14 +37,19 @@ import com.alchemiasoft.books.fragment.AddNoteFragment;
 import com.alchemiasoft.books.fragment.BuyBookFragment;
 import com.alchemiasoft.books.fragment.InfoFragment;
 import com.alchemiasoft.books.fragment.SettingsFragment;
+import com.alchemiasoft.common.sync.Event;
 import com.alchemiasoft.common.util.UriUtil;
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Wearable;
 
 import static com.alchemiasoft.common.content.BookDB.Book;
 
 /**
  * Activity that displays some of the info about all the available books.
  */
-public class BooksActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, GridViewPager.OnPageChangeListener {
+public class BooksActivity extends FragmentActivity implements LoaderManager.LoaderCallbacks<Cursor>, GridViewPager.OnPageChangeListener, GoogleApiClient.ConnectionCallbacks {
 
     /**
      * Loader id.
@@ -56,6 +61,8 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
      * This is done because we don't want to display tons of content to the user.
      */
     private static final int MAX_ROWS = 5;
+
+    private static final int NOT_VALID = -1;
 
     /**
      * Fading values.
@@ -80,6 +87,13 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
 
     private CrossfadeDrawable mCrossfadeDrawable;
 
+    /**
+     * Client used by the wearable api to notify about the current book.
+     */
+    private GoogleApiClient mGoogleApiClient;
+
+    private int mOldRow = NOT_VALID;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -98,14 +112,50 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
         mPageIndicator.setPager(mViewPager);
         // Adding the page change listener
         mViewPager.setOnPageChangeListener(this);
+        // Creating the GoogleApiClient for the Wearable api (if available)
+        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addApi(Wearable.API).build();
+        }
         // Initializing the loader
         getLoaderManager().initLoader(LOADER_ID_SUGGESTIONS, null, this);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Trying to bind to the GoogleApiClient
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.connect();
+        }
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // Releasing the client when not needed
+        if (mGoogleApiClient != null) {
+            mGoogleApiClient.disconnect();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         getLoaderManager().destroyLoader(LOADER_ID_SUGGESTIONS);
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (mOldRow != NOT_VALID) {
+            long bookId = mAdapter.getBookId(mOldRow);
+            if (bookId >= 0) {
+                Event.MessageApi.Sender.create(mGoogleApiClient, bookId).action(Event.MessageApi.OPEN).asyncSend();
+            }
+        }
+    }
+
+    @Override
+    public void onConnectionSuspended(int status) {
     }
 
     @Override
@@ -137,8 +187,14 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
 
     @Override
     public void onPageSelected(int row, int column) {
-        if (column == 0) {
+        if (mOldRow != row) {
+            mOldRow = row;
             mCrossfadeDrawable.setBase(mAdapter.getBaseDrawable(row));
+            // Notifying that the user is looking at the X row.
+            final long bookId = mAdapter.getBookId(row);
+            if (mGoogleApiClient != null && mGoogleApiClient.isConnected() && bookId >= 0L) {
+                Event.MessageApi.Sender.create(mGoogleApiClient, bookId).action(Event.MessageApi.OPEN).asyncSend();
+            }
         }
         mCrossfadeDrawable.setProgress(mAdapter.isCard(row, column) ? NO_FADE : PARTIAL_FADE);
         mPageIndicator.onPageSelected(row, column);
@@ -275,6 +331,15 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
 
         public boolean isEmpty() {
             return mCursor == null || mCursor.getCount() == 0;
+        }
+
+        public long getBookId(int row) {
+            if (isEmpty()) {
+                return NOT_VALID;
+            }
+            // Positioning the cursor at the right row
+            mCursor.moveToPosition(row);
+            return mCursor.getLong(mCursor.getColumnIndex(Book._ID));
         }
 
         public Drawable getBaseDrawable(int row) {

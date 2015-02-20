@@ -89,10 +89,33 @@ public final class UriUtil {
      * @return an uri that can apply a WHERE filter.
      */
     public static Uri withWhere(@NonNull Uri source, @Nullable String where) {
-        if (TextUtils.isEmpty(where)) {
+        return withParam(source, KEY_WHERE, where);
+    }
+
+    /**
+     * Creates a new Uri for the given param.
+     *
+     * @param source for the uri.
+     * @param key    that has to be used for the query param.
+     * @param param  that has to be appended.
+     * @return an Uri that contains the given param as a query param.
+     */
+    public static Uri withParam(@NonNull Uri source, @NonNull String key, @Nullable String param) {
+        if (TextUtils.isEmpty(param)) {
             return source;
         }
-        return source.buildUpon().appendQueryParameter(KEY_WHERE, where).build();
+        return source.buildUpon().appendQueryParameter(key, param).build();
+    }
+
+    /**
+     * Return the value associated with the given key.
+     *
+     * @param uri used to extract the argument.
+     * @param key used to get the param.
+     * @return the param or null.
+     */
+    public static String getParam(@NonNull Uri uri, @NonNull String key) {
+        return uri.getQueryParameter(key);
     }
 
     /**

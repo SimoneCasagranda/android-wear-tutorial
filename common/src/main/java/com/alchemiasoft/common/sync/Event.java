@@ -19,14 +19,28 @@ package com.alchemiasoft.common.sync;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.net.Uri;
+import android.support.annotation.IntDef;
+import android.text.TextUtils;
 
 import com.alchemiasoft.common.content.BookDB;
 import com.alchemiasoft.common.util.UriUtil;
+import com.alchemiasoft.common.util.WearableUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.wearable.DataItem;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.DataMapItem;
+import com.google.android.gms.wearable.MessageApi.SendMessageResult;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 /**
  * Class that allows to represent a book event.
@@ -36,6 +50,9 @@ import com.google.android.gms.wearable.PutDataRequest;
  */
 public final class Event {
 
+    /**
+     * Entry point for the Events associated with the DataApi.
+     */
     public static final class DataApi {
 
         public static final class Builder {
@@ -131,6 +148,164 @@ public final class Event {
         }
     }
 
+    /**
+     * Entry point for the Events associated with the Wearable message api.
+     */
     public static final class MessageApi {
+
+        private static final String ACTION = "action";
+
+        public static final int OPEN = 23;
+
+        @IntDef({OPEN})
+        @Retention(RetentionPolicy.SOURCE)
+        private @interface Action {
+        }
+
+        /**
+         * Utility that allows to build and send a message through the WearableApi,
+         * through a builder style.
+         */
+        public static class Sender {
+
+            private static final byte[] DEFAULT_DATA = new byte[0];
+
+            private static final Executor EXECUTOR = Executors.newSingleThreadExecutor();
+            private static final ResultCallback<SendMessageResult> SILENT_CALLBACK = new ResultCallback<SendMessageResult>() {
+                @Override
+                public void onResult(SendMessageResult sendMessageResult) {
+                }
+            };
+
+            private final GoogleApiClient mClient;
+            private String mTarget;
+            private long mBookId;
+            private int mAction;
+
+            private ResultCallback<SendMessageResult> mCallback;
+
+            private Sender(GoogleApiClient client) {
+                mClient = client;
+            }
+
+            /**
+             * Creates an instance of Sender for the given book and GoogleApiClient.
+             *
+             * @param client used to send the message.
+             * @param bookId that will be sent.
+             * @return the Sender instance that supports method chaining.
+             */
+            public static Sender create(GoogleApiClient client, long bookId) {
+                return new Sender(client).bookId(bookId).action(OPEN);
+            }
+
+            /**
+             * Allows to specify a custom action.
+             *
+             * @param action associated with the current message.
+             * @return the Sender to allow method chaining.
+             */
+            public Sender action(@Action int action) {
+                mAction = action;
+                return this;
+            }
+
+            /**
+             * Allows to set the book id.
+             *
+             * @param bookId that has to be set.
+             * @return the Sender to allow method chaining.
+             */
+            public Sender bookId(long bookId) {
+                mBookId = bookId;
+                return this;
+            }
+
+            /**
+             * Allows to specify a particular target for the message.
+             *
+             * @param nodeId of the target.
+             * @return the Sender to allow method chaining.
+             */
+            public Sender target(String nodeId) {
+                mTarget = nodeId;
+                return this;
+            }
+
+            /**
+             * Allows to set a result Callback that will be notified of the sending status.
+             *
+             * @param callback that has to be notified.
+             * @return the Sender to allow method chaining.
+             */
+            public Sender callback(ResultCallback<SendMessageResult> callback) {
+                mCallback = callback;
+                return this;
+            }
+
+            /**
+             * Sends the message trying to fill missing parameters.
+             */
+            public void send() {
+                if (TextUtils.isEmpty(mTarget)) {
+                    final Node node = WearableUtil.getConnectedNoteAt(mClient, 0);
+                    mTarget = node == null ? null : node.getId();
+                }
+                if (TextUtils.isEmpty(mTarget)) {
+                    return;
+                }
+                if (mCallback == null) {
+                    mCallback = SILENT_CALLBACK;
+                }
+                Uri uri = BookDB.Book.create(mBookId);
+                uri = UriUtil.withParam(uri, ACTION, String.valueOf(mAction));
+                Wearable.MessageApi.sendMessage(mClient, mTarget, uri.toString(), DEFAULT_DATA).setResultCallback(mCallback);
+            }
+
+            public void asyncSend() {
+                EXECUTOR.execute(new Runnable() {
+                    @Override
+                    public void run() {
+                        send();
+                    }
+                });
+            }
+        }
+
+        /**
+         * Allows to handle a MessageEvent granting the possibility to access restricted params.
+         */
+        public static class Receiver {
+
+            private final Uri mUri;
+
+            private Receiver(MessageEvent event) {
+                mUri = Uri.parse(event.getPath());
+            }
+
+            /**
+             * Creates a new Receiver for the given event.
+             *
+             * @param event that has to be parsed.
+             * @return the Receiver instance for the given event.
+             */
+            public static Receiver from(MessageEvent event) {
+                return new Receiver(event);
+            }
+
+            /**
+             * @return the book id associated with the event.
+             */
+            public long bookId() {
+                return Long.parseLong(mUri.getLastPathSegment());
+            }
+
+            /**
+             * @return the action associated with the event.
+             */
+            public int action() {
+                return Integer.parseInt(UriUtil.getParam(mUri, ACTION));
+            }
+        }
     }
 }

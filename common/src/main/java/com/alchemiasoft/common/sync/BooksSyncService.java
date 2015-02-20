@@ -67,6 +67,8 @@ public class BooksSyncService extends WearableListenerService {
                 final Event.DataApi.Item item = Event.DataApi.Item.from(event.getDataItem());
                 String where = item.where();
                 String[] whereArgs = item.whereArgs();
+                // In a real application case you can create a builder for these kind of operations,
+                // it definitely keeps the code cleaner, more readable and maintainable.
                 if (TextUtils.isEmpty(where)) {
                     where = WHERE_BEFORE;
                     whereArgs = new String[]{String.valueOf(item.time())};
