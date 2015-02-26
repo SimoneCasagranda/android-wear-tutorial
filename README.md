@@ -11,7 +11,7 @@ Starting from a sample application running just on an handheld device, the code 
 2. [Landing on Wearables][3] (debugging, extending notifications)
 3. [Colonizing Wearables][4] (running apps on an Android Wear)
 4. [Pimp my Wear][5] (custom UI’s)
-5. Data exchange and Sync
+5. [Data exchange and Sync][6]
 6. Miscellaneous
 
 
@@ -43,3 +43,4 @@ License
 [3]: https://alchemiasoft.wordpress.com/2015/01/06/landing-on-wearables/
 [4]: https://alchemiasoft.wordpress.com/2015/01/16/colonizing-wearables/
 [5]: https://alchemiasoft.wordpress.com/2015/02/05/pimp-my-wear/
+[6]: https://alchemiasoft.wordpress.com/2015/02/26/data-exchange-and-sync/
