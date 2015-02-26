@@ -63,6 +63,7 @@ public class BooksSyncService extends WearableListenerService {
                 final String localNode = WearableUtil.getLocalNode(this).getId();
                 if (node.equals(localNode)) {
                     Log.d(TAG_LOG, "Skipping Event because fired from the same receiver.");
+                    continue;
                 }
                 final Event.DataApi.Item item = Event.DataApi.Item.from(event.getDataItem());
                 String where = item.where();
