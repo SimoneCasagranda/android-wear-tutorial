@@ -14,6 +14,8 @@ Starting from a sample application running just on an handheld device, the code 
 5. [Data exchange and Sync][6]
 6. [Miscellaneous][7]
 
+**A PDF that can be used as reference is available at**
+[http://goo.gl/5RT8j5][8]
 
 Developed By
 ============
@@ -45,3 +47,4 @@ License
 [5]: https://alchemiasoft.wordpress.com/2015/02/05/pimp-my-wear/
 [6]: https://alchemiasoft.wordpress.com/2015/02/26/data-exchange-and-sync/
 [7]: https://alchemiasoft.wordpress.com/2015/04/03/miscellaneous-part-6/
+[8]: http://goo.gl/5RT8j5
