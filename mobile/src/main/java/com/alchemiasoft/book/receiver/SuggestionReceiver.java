@@ -18,9 +18,9 @@ package com.alchemiasoft.book.receiver;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.support.v4.content.WakefulBroadcastReceiver;
 import android.text.format.DateUtils;
 import android.util.Log;
 
@@ -29,12 +29,12 @@ import com.alchemiasoft.book.user.UserData;
 import com.alchemiasoft.common.util.AlarmUtil;
 
 /**
- * WakefulBroadcastReceiver that spawn a SuggestionService when it's time to show the user a book
+ * BroadcastReceiver that enqueues a SuggestionService job when it's time to show the user a book
  * suggestion.
  * <p/>
  * Created by Simone Casagranda on 27/12/14.
  */
-public class SuggestionReceiver extends WakefulBroadcastReceiver {
+public class SuggestionReceiver extends BroadcastReceiver {
 
     /**
      * Tag used for logging.
@@ -67,8 +67,9 @@ public class SuggestionReceiver extends WakefulBroadcastReceiver {
         if (interval == UserData.SuggestionInterval.NEVER) {
             return false;
         }
-        final Intent intent = new Intent(SUGGESTION_ACTION);
-        sPendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+        // Implicit broadcasts are not delivered to manifest receivers since Android 8.0: target this receiver explicitly.
+        final Intent intent = new Intent(context, SuggestionReceiver.class).setAction(SUGGESTION_ACTION);
+        sPendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         final long refreshInMills = interval.seconds() * DateUtils.SECOND_IN_MILLIS;
         Log.d(TAG_LOG, "AlarmReceiver: scheduling suggestion in " + interval.seconds() + " sec(s).");
         alarmManager.set(AlarmManager.RTC, System.currentTimeMillis() + refreshInMills, sPendingIntent);
@@ -85,7 +86,7 @@ public class SuggestionReceiver extends WakefulBroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        final Intent serviceIntent = new Intent(context, SuggestionService.class);
-        startWakefulService(context, serviceIntent);
+        // Background services cannot be started from a broadcast since Android 8.0: enqueue a job instead.
+        SuggestionService.enqueue(context);
     }
 }

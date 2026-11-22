@@ -28,20 +28,21 @@ import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
-import android.support.v4.app.RemoteInput;
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.RemoteInput;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.alchemiasoft.book.R;
 import com.alchemiasoft.book.activity.HomeActivity;
+import com.alchemiasoft.book.util.NotificationChannels;
 import com.alchemiasoft.common.content.BookDB;
 import com.alchemiasoft.common.model.Book;
 import com.alchemiasoft.common.sync.Event;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Wearable;
 
@@ -162,7 +163,7 @@ public class BookActionService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+        if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
             mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
         }
     }
@@ -198,20 +199,21 @@ public class BookActionService extends IntentService {
                     if (cr.update(uri, cv, null, null) == 1 && intent.getBooleanExtra(EXTRA_WEARABLE_INPUT, false)) {
                         final Book book = getBook(bookId);
                         if (book != null) {
-                            final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+                            NotificationChannels.ensureCreated(this);
+                            final NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationChannels.BOOKS);
                             builder.setSmallIcon(R.drawable.ic_launcher).setAutoCancel(true).setContentTitle(getString(R.string.book_purchased)).setContentText(book.getTitle());
-                            builder.setContentIntent(PendingIntent.getActivity(this, 0, HomeActivity.createFor(this, book), PendingIntent.FLAG_UPDATE_CURRENT));
+                            builder.setContentIntent(PendingIntent.getActivity(this, 0, HomeActivity.createFor(this, book), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
 
                             // ONLY 4 WEARABLE(s)
                             final NotificationCompat.WearableExtender wearableExtender = new NotificationCompat.WearableExtender();
                             wearableExtender.setBackground(BitmapFactory.decodeResource(getResources(), R.drawable.background));
                             // ACTION TO SELL A BOOK FROM A WEARABLE
-                            final PendingIntent sellIntent = PendingIntent.getService(this, 0, BookActionService.IntentBuilder.sell(this, book).notificationId(NOTIFICATION_ID).wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT);
+                            final PendingIntent sellIntent = PendingIntent.getService(this, 0, BookActionService.IntentBuilder.sell(this, book).notificationId(NOTIFICATION_ID).wearableInput().build(), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
                             wearableExtender.addAction(new NotificationCompat.Action.Builder(R.drawable.ic_action_sell, getString(R.string.action_sell), sellIntent).build());
                             // Finally extending the notification
                             builder.extend(wearableExtender);
 
-                            NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, builder.build());
+                            NotificationChannels.notify(this, NOTIFICATION_ID, builder.build());
                         }
                     }
                     // We want to sync with the wearable
@@ -222,11 +224,12 @@ public class BookActionService extends IntentService {
                     if (cr.update(uri, cv, null, null) == 1 && intent.getBooleanExtra(EXTRA_WEARABLE_INPUT, false)) {
                         final Book book = getBook(bookId);
                         if (book != null) {
-                            final NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+                            NotificationChannels.ensureCreated(this);
+                            final NotificationCompat.Builder builder = new NotificationCompat.Builder(this, NotificationChannels.BOOKS);
                             builder.setSmallIcon(R.drawable.ic_launcher).setAutoCancel(true).setContentTitle(getString(R.string.book_sold)).setContentText(book.getTitle());
-                            builder.setContentIntent(PendingIntent.getActivity(this, 0, HomeActivity.createFor(this, book), PendingIntent.FLAG_UPDATE_CURRENT));
+                            builder.setContentIntent(PendingIntent.getActivity(this, 0, HomeActivity.createFor(this, book), PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE));
 
-                            NotificationManagerCompat.from(this).notify(NOTIFICATION_ID, builder.build());
+                            NotificationChannels.notify(this, NOTIFICATION_ID, builder.build());
                         }
                     }
                     // We want to sync with the wearable

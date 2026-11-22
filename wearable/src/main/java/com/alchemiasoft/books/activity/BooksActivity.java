@@ -24,7 +24,7 @@ import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
+import androidx.fragment.app.FragmentActivity;
 import android.support.wearable.view.CardFragment;
 import android.support.wearable.view.CrossfadeDrawable;
 import android.support.wearable.view.DotsPageIndicator;
@@ -40,7 +40,7 @@ import com.alchemiasoft.books.fragment.SettingsFragment;
 import com.alchemiasoft.common.sync.Event;
 import com.alchemiasoft.common.util.UriUtil;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Wearable;
 
@@ -113,7 +113,7 @@ public class BooksActivity extends FragmentActivity implements LoaderManager.Loa
         // Adding the page change listener
         mViewPager.setOnPageChangeListener(this);
         // Creating the GoogleApiClient for the Wearable api (if available)
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+        if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
             mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addApi(Wearable.API).build();
         }
         // Initializing the loader

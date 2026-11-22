@@ -19,7 +19,7 @@ package com.alchemiasoft.book.user;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * Entity that wraps the data related to the current user.

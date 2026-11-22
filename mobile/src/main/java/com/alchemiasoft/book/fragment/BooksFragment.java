@@ -19,16 +19,16 @@ package com.alchemiasoft.book.fragment;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
-import android.support.v4.content.Loader;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.PopupMenu;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.FragmentActivity;
+import androidx.loader.app.LoaderManager;
+import androidx.loader.content.CursorLoader;
+import androidx.loader.content.Loader;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.appcompat.widget.PopupMenu;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import android.view.Gravity;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -139,13 +139,13 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
     public void onResume() {
         super.onResume();
         // Initialising the loader
-        getLoaderManager().initLoader(ID_LOADER_BOOKS, getArguments(), this);
+        LoaderManager.getInstance(this).initLoader(ID_LOADER_BOOKS, getArguments(), this);
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        getLoaderManager().destroyLoader(ID_LOADER_BOOKS);
+        LoaderManager.getInstance(this).destroyLoader(ID_LOADER_BOOKS);
     }
 
     @Override
@@ -244,23 +244,24 @@ public class BooksFragment extends RecyclerViewFragment implements LoaderManager
                         @Override
                         public boolean onMenuItemClick(MenuItem menuItem) {
                             final Context context = v.getContext();
-                            switch (menuItem.getItemId()) {
-                                case R.id.action_buy:
-                                    if (book.isOwned()) {
-                                        Toast.makeText(context, context.getString(R.string.book_already_owned), Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        context.startService(BookActionService.IntentBuilder.buy(context, book).build());
-                                    }
-                                    return true;
-                                case R.id.action_sell:
-                                    if (!book.isOwned()) {
-                                        Toast.makeText(context, context.getString(R.string.book_not_owned), Toast.LENGTH_SHORT).show();
-                                    } else {
-                                        context.startService(BookActionService.IntentBuilder.sell(context, book).build());
-                                    }
-                                    return true;
-                                default:
-                                    return false;
+                            // R.id values are not compile-time constants anymore: if/else instead of switch.
+                            final int itemId = menuItem.getItemId();
+                            if (itemId == R.id.action_buy) {
+                                if (book.isOwned()) {
+                                    Toast.makeText(context, context.getString(R.string.book_already_owned), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    context.startService(BookActionService.IntentBuilder.buy(context, book).build());
+                                }
+                                return true;
+                            } else if (itemId == R.id.action_sell) {
+                                if (!book.isOwned()) {
+                                    Toast.makeText(context, context.getString(R.string.book_not_owned), Toast.LENGTH_SHORT).show();
+                                } else {
+                                    context.startService(BookActionService.IntentBuilder.sell(context, book).build());
+                                }
+                                return true;
+                            } else {
+                                return false;
                             }
                         }
                     });

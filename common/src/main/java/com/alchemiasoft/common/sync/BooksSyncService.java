@@ -22,13 +22,13 @@ import android.util.Log;
 import com.alchemiasoft.common.content.BookDB;
 import com.alchemiasoft.common.util.ArraysUtil;
 import com.alchemiasoft.common.util.WearableUtil;
-import com.google.android.gms.common.data.FreezableUtils;
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
 import com.google.android.gms.wearable.MessageEvent;
 import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.WearableListenerService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -53,8 +53,11 @@ public class BooksSyncService extends WearableListenerService {
     public void onDataChanged(DataEventBuffer dataEvents) {
         super.onDataChanged(dataEvents);
         Log.d(TAG_LOG, "onDataChanged(" + dataEvents + ")");
-        // Extracting the DataEvent(s).
-        final List<DataEvent> events = FreezableUtils.freezeIterable(dataEvents);
+        // Extracting (freezing) the DataEvent(s): the buffer is released when this method returns.
+        final List<DataEvent> events = new ArrayList<>();
+        for (DataEvent event : dataEvents) {
+            events.add(event.freeze());
+        }
         // Running through all the events
         for (DataEvent event : events) {
             if (event.getType() == DataEvent.TYPE_CHANGED) {

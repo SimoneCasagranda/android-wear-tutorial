@@ -28,7 +28,7 @@ import android.util.Log;
 import com.alchemiasoft.common.content.BookDB;
 import com.alchemiasoft.common.sync.Event;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.wearable.Wearable;
 
@@ -131,7 +131,7 @@ public class BookService extends IntentService {
     @Override
     public void onCreate() {
         super.onCreate();
-        if (GooglePlayServicesUtil.isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
+        if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
             mGoogleApiClient = new GoogleApiClient.Builder(this).addApi(Wearable.API).build();
         }
     }

@@ -18,7 +18,7 @@ package com.alchemiasoft.common.model;
 
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.alchemiasoft.common.content.BookDB;
 

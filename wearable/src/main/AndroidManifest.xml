@@ -14,8 +14,7 @@
   ~ limitations under the License.
   -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.alchemiasoft.books">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-feature android:name="android.hardware.type.watch" />
 
@@ -24,6 +23,16 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.DeviceDefault.Light">
+
+        <!-- The watch app works together with the phone app (it is not standalone). -->
+        <meta-data
+            android:name="com.google.android.wearable.standalone"
+            android:value="false" />
+
+        <!-- Shared library backing the legacy Wear support classes (compileOnly dependency). -->
+        <uses-library
+            android:name="com.google.android.wearable"
+            android:required="false" />
         <activity
             android:name=".activity.BooksActivity"
             android:exported="true"
@@ -43,9 +52,22 @@
             android:name=".service.BookService"
             android:exported="false" />
 
-        <service android:name="com.alchemiasoft.common.sync.BooksSyncService">
+        <!-- BIND_LISTENER was removed from Play Services: listen for the specific events instead. -->
+        <service
+            android:name="com.alchemiasoft.common.sync.BooksSyncService"
+            android:exported="true">
             <intent-filter>
-                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data
+                    android:host="*"
+                    android:pathPrefix="/"
+                    android:scheme="wear" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
+                <data
+                    android:host="*"
+                    android:scheme="wear" />
             </intent-filter>
         </service>
 
