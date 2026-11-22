@@ -44,6 +44,7 @@ class BookTest {
         .put("description", "A book about Kotlin")
         .put("pages", 360)
         .put("tag", "kotlin")
+        .put("cover", "https://example.com/cover.jpg")
 
     @Test
     fun parsesJson() {
@@ -56,6 +57,7 @@ class BookTest {
         assertEquals("A book about Kotlin", book.description)
         assertEquals(360, book.pages)
         assertEquals("kotlin", book.tag)
+        assertEquals("https://example.com/cover.jpg", book.cover)
         assertFalse(book.isOwned)
         assertNull(book.notes)
         assertEquals("Kotlin in Action - Dmitry Jemerov (360--srv-1).", book.toString())
@@ -65,6 +67,8 @@ class BookTest {
     fun parsesJsonArray() {
         val books = Book.allFrom(JSONArray().put(json).put(JSONObject().put("title", "Second")))
         assertEquals(listOf("Kotlin in Action", "Second"), books.map { it.title })
+        // A book without a cover in the JSON has a null cover (not an empty string).
+        assertNull(books[1].cover)
     }
 
     @Test
@@ -73,6 +77,7 @@ class BookTest {
         assertEquals("srv-1", values.getAsString(BookDB.Book.SERVER_ID))
         assertEquals("Kotlin in Action", values.getAsString(BookDB.Book.TITLE))
         assertEquals(360, values.getAsInteger(BookDB.Book.PAGES))
+        assertEquals("https://example.com/cover.jpg", values.getAsString(BookDB.Book.COVER))
         assertEquals(false, values.getAsBoolean(BookDB.Book.OWNED))
         assertTrue(values.containsKey(BookDB.Book.NOTES))
     }

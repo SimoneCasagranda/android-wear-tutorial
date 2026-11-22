@@ -55,6 +55,9 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.13.0'
     implementation "androidx.lifecycle:lifecycle-viewmodel-compose:${rootProject.ext.lifecycle}"
     implementation "androidx.lifecycle:lifecycle-runtime-compose:${rootProject.ext.lifecycle}"
+    // Book cover images
+    implementation "io.coil-kt.coil3:coil-compose:${rootProject.ext.coil}"
+    implementation "io.coil-kt.coil3:coil-network-okhttp:${rootProject.ext.coil}"
     debugImplementation 'androidx.compose.ui:ui-tooling'
     debugImplementation 'androidx.compose.ui:ui-test-manifest'
     implementation project(':common')
@@ -66,4 +69,5 @@ dependencies {
     androidTestImplementation 'androidx.test:rules:1.7.0'
     androidTestImplementation platform("androidx.compose:compose-bom:${rootProject.ext.composeBom}")
     androidTestImplementation 'androidx.compose.ui:ui-test-junit4'
+    androidTestImplementation "io.coil-kt.coil3:coil-test:${rootProject.ext.coil}"
 }

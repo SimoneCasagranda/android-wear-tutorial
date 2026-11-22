@@ -29,7 +29,8 @@ import android.provider.BaseColumns
 object BookDB {
 
     const val NAME = "book.db"
-    const val VERSION = 6
+    // 7: cover image URL. Upgrading recreates the table from books.json (see BookDBOpenHelper.onUpgrade).
+    const val VERSION = 7
 
     const val AUTHORITY = "com.alchemiasoft.book.provider"
     const val VND = "/vnd.book."
@@ -55,10 +56,12 @@ object BookDB {
         const val NOTES = "notes"
         const val TAG = "tag"
         const val UPDATED_AT = "updated_at"
+        const val COVER = "cover"
 
         const val CREATE_TABLE = "CREATE TABLE " + TABLE + " (_id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 SERVER_ID + " TEXT NOT NULL, " + TITLE + " TEXT NOT NULL, " + AUTHOR + " TEXT, " + SOURCE + " TEXT, " + TAG + " TEXT, " +
-                DESCRIPTION + " TEXT, " + PAGES + " INTEGER, " + NOTES + " TEXT, " + UPDATED_AT + " INTEGER DEFAULT 0, " + OWNED + " BOOLEAN);"
+                DESCRIPTION + " TEXT, " + PAGES + " INTEGER, " + NOTES + " TEXT, " + UPDATED_AT + " INTEGER DEFAULT 0, " + OWNED + " BOOLEAN, " +
+                COVER + " TEXT);"
         const val DELETE_TABLE = "DROP TABLE IF EXISTS $TABLE;"
 
         const val PATH = "book"

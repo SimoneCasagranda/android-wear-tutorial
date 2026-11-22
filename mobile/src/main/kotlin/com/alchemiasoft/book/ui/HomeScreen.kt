@@ -18,6 +18,14 @@
 package com.alchemiasoft.book.ui
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -57,6 +65,11 @@ fun HomeScreen(
 ) {
     val selectedBookId by viewModel.selectedBookId.collectAsStateWithLifecycle()
     val filter by viewModel.filter.collectAsStateWithLifecycle()
+    val books by viewModel.books.collectAsStateWithLifecycle()
+    val detail by viewModel.detail.collectAsStateWithLifecycle()
+    // Hoisted so coming back from a book returns to the same scroll position (and the same card).
+    val allBooksGrid = rememberLazyStaggeredGridState()
+    val ownedBooksGrid = rememberLazyStaggeredGridState()
 
     // Back from the detail goes back to the list.
     BackHandler(enabled = selectedBookId != null) { viewModel.closeBook() }
@@ -71,30 +84,41 @@ fun HomeScreen(
             )
         },
     ) { padding ->
-        Box(Modifier.fillMaxSize().padding(padding)) {
-            if (selectedBookId == null) {
-                val books by viewModel.books.collectAsStateWithLifecycle()
-                when (val state = books) {
-                    HomeViewModel.BooksState.Loading -> Loading()
-                    is HomeViewModel.BooksState.Loaded -> BookList(
-                        books = state.books,
-                        onBookClick = { viewModel.openBook(it.id) },
-                        onBuyClick = viewModel::buy,
-                        onSellClick = viewModel::sell,
-                        modifier = Modifier.testTag(if (filter == HomeViewModel.Filter.OWNED) TAG_OWNED_LIST else TAG_ALL_LIST),
-                    )
-                }
-            } else {
-                val detail by viewModel.detail.collectAsStateWithLifecycle()
-                when (val state = detail) {
-                    HomeViewModel.DetailState.Loading -> Loading()
-                    is HomeViewModel.DetailState.Loaded -> BookDetail(
-                        book = state.book,
-                        onBuyClick = viewModel::buy,
-                        onSellClick = viewModel::sell,
-                    )
-                    // The book doesn't exist (anymore): nothing to show, like the original fragment.
-                    HomeViewModel.DetailState.Missing -> Unit
+        // The list and the detail cross-fade while the tapped cover grows into the detail header.
+        SharedTransitionLayout(Modifier.fillMaxSize().padding(padding)) {
+            AnimatedContent(
+                targetState = selectedBookId,
+                transitionSpec = { fadeIn(tween(TRANSITION_MS)) togetherWith fadeOut(tween(TRANSITION_MS)) },
+                label = "list-detail",
+            ) { bookId ->
+                CompositionLocalProvider(
+                    LocalSharedTransitionScope provides this@SharedTransitionLayout,
+                    LocalAnimatedVisibilityScope provides this,
+                ) {
+                    if (bookId == null) {
+                        when (val state = books) {
+                            HomeViewModel.BooksState.Loading -> Loading()
+                            is HomeViewModel.BooksState.Loaded -> BookList(
+                                books = state.books,
+                                onBookClick = { viewModel.openBook(it.id) },
+                                onBuyClick = viewModel::buy,
+                                onSellClick = viewModel::sell,
+                                gridState = if (filter == HomeViewModel.Filter.OWNED) ownedBooksGrid else allBooksGrid,
+                                modifier = Modifier.testTag(if (filter == HomeViewModel.Filter.OWNED) TAG_OWNED_LIST else TAG_ALL_LIST),
+                            )
+                        }
+                    } else {
+                        // Use the book the list already has, so the detail is there on the first frame
+                        // (the shared cover needs a target) while the provider query catches up.
+                        val book = (detail as? HomeViewModel.DetailState.Loaded)?.book?.takeIf { it.id == bookId }
+                            ?: (books as? HomeViewModel.BooksState.Loaded)?.books?.firstOrNull { it.id == bookId }
+                        when {
+                            book != null -> BookDetail(book = book, onBuyClick = viewModel::buy, onSellClick = viewModel::sell)
+                            // The book doesn't exist (anymore): nothing to show, like the original fragment.
+                            detail == HomeViewModel.DetailState.Missing(bookId) -> Unit
+                            else -> Loading()
+                        }
+                    }
                 }
             }
         }
@@ -155,6 +179,8 @@ private fun Loading() {
         CircularProgressIndicator()
     }
 }
+
+private const val TRANSITION_MS = 400
 
 const val TAG_ALL_LIST = "all_books_list"
 const val TAG_OWNED_LIST = "owned_books_list"

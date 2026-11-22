@@ -28,7 +28,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -70,6 +72,7 @@ fun BookList(
     onBuyClick: (Book) -> Unit,
     onSellClick: (Book) -> Unit,
     modifier: Modifier = Modifier,
+    gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
 ) {
     if (books.isEmpty()) {
         Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -80,6 +83,7 @@ fun BookList(
     LazyVerticalStaggeredGrid(
         columns = StaggeredGridCells.Fixed(COLUMN_COUNT),
         modifier = modifier.fillMaxSize(),
+        state = gridState,
         contentPadding = PaddingValues(6.dp),
         verticalItemSpacing = 6.dp,
         horizontalArrangement = Arrangement.spacedBy(6.dp),
@@ -99,6 +103,7 @@ private fun BookCard(book: Book, onClick: () -> Unit, onBuyClick: () -> Unit, on
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
         modifier = Modifier.fillMaxWidth().testTag("book_${book.id}"),
     ) {
+        BookCover(book, Modifier.fillMaxWidth())
         // Same layout as the original card: menu top-right, "owned" marker bottom-right.
         Box(Modifier.fillMaxWidth()) {
             Column(Modifier.padding(start = 8.dp, top = 12.dp, end = 44.dp, bottom = 8.dp)) {
@@ -154,6 +159,7 @@ private fun BookMenu(onBuyClick: () -> Unit, onSellClick: () -> Unit) {
 }
 
 private const val COLUMN_COUNT = 2
+
 
 /**
  * Accessibility description of the "owned" marker (also used by the UI tests).

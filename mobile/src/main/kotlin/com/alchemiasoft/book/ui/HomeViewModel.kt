@@ -50,7 +50,7 @@ class HomeViewModel(application: Application, private val savedState: SavedState
     sealed interface DetailState {
         data object Loading : DetailState
         data class Loaded(val book: Book) : DetailState
-        data object Missing : DetailState
+        data class Missing(val bookId: Long?) : DetailState
     }
 
     private val mRepository = BookRepository(application)
@@ -70,9 +70,9 @@ class HomeViewModel(application: Application, private val savedState: SavedState
     val detail: StateFlow<DetailState> = selectedBookId
         .flatMapLatest { id ->
             if (id == null) {
-                flowOf(DetailState.Missing)
+                flowOf(DetailState.Missing(null))
             } else {
-                mRepository.observeBook(id).map { book -> if (book != null) DetailState.Loaded(book) else DetailState.Missing }
+                mRepository.observeBook(id).map { book -> if (book != null) DetailState.Loaded(book) else DetailState.Missing(id) }
             }
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(STOP_TIMEOUT_MS), DetailState.Loading)
