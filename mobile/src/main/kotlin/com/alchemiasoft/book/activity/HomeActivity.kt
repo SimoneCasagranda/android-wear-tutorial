@@ -41,6 +41,9 @@ import com.alchemiasoft.book.ui.HomeScreen
 import com.alchemiasoft.book.ui.HomeViewModel
 import com.alchemiasoft.book.ui.theme.BooksTheme
 import com.alchemiasoft.common.model.Book
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.request.crossfade
 import com.alchemiasoft.common.sync.Event
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
@@ -66,6 +69,8 @@ class HomeActivity : ComponentActivity(), MessageApi.MessageListener, GoogleApiC
         enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(Color.TRANSPARENT))
         super.onCreate(savedInstanceState)
         setContent {
+            // Covers fade in once loaded (memory and disk caches are Coil's defaults).
+            setSingletonImageLoaderFactory { context -> ImageLoader.Builder(context).crossfade(true).build() }
             BooksTheme {
                 HomeScreen(
                     viewModel = mViewModel,

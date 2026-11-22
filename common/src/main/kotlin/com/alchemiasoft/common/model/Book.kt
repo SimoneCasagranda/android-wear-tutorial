@@ -53,6 +53,12 @@ class Book private constructor() {
     var tag: String? = null
         private set
 
+    /**
+     * URL of the cover image, or null when the book has none.
+     */
+    var cover: String? = null
+        private set
+
     fun toValues(): ContentValues = ContentValues().apply {
         put(BookDB.Book.SERVER_ID, serverId)
         put(BookDB.Book.TITLE, title)
@@ -63,6 +69,7 @@ class Book private constructor() {
         put(BookDB.Book.NOTES, notes)
         put(BookDB.Book.OWNED, isOwned)
         put(BookDB.Book.TAG, tag)
+        put(BookDB.Book.COVER, cover)
     }
 
     override fun toString(): String = "$title - $author ($pages--$serverId)."
@@ -83,6 +90,7 @@ class Book private constructor() {
             c.ifColumn(BookDB.Book.OWNED) { isOwned = c.getInt(it) == 1 }
             c.ifColumn(BookDB.Book.UPDATED_AT) { updatedAt = c.getLong(it) }
             c.ifColumn(BookDB.Book.TAG) { tag = c.getString(it) }
+            c.ifColumn(BookDB.Book.COVER) { cover = c.getString(it) }
         }
 
         fun allFrom(c: Cursor): List<Book> {
@@ -101,6 +109,8 @@ class Book private constructor() {
             description = json.optString("description")
             pages = json.optInt("pages")
             tag = json.optString("tag")
+            // optString returns "" for a missing key: no cover means null.
+            cover = json.optString("cover").ifEmpty { null }
         }
 
         fun allFrom(jsonArr: JSONArray): List<Book> = List(jsonArr.length()) { oneFrom(jsonArr.optJSONObject(it)) }
