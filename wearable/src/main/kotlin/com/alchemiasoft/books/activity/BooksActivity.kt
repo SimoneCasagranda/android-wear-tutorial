@@ -15,35 +15,25 @@
  */
 
 
-// The watch UI is built on the legacy Wear support library (framework fragments/loaders, GridViewPager)
-// and the GoogleApiClient-based Wearable APIs: both deprecated, both kept on purpose for the tutorial.
-@file:Suppress("DEPRECATION", "OVERRIDE_DEPRECATION")
+// The phone notification uses the GoogleApiClient-based Wearable APIs (deprecated, still shipped in play-services-wearable).
+@file:Suppress("DEPRECATION")
 
 package com.alchemiasoft.books.activity
 
-import android.app.Activity
-import android.app.Fragment
-import android.app.LoaderManager
-import android.content.CursorLoader
-import android.content.Loader
-import android.database.Cursor
-import android.graphics.drawable.Drawable
+import android.content.Intent
 import android.os.Bundle
-import android.support.wearable.view.CardFragment
-import android.support.wearable.view.CrossfadeDrawable
-import android.support.wearable.view.DotsPageIndicator
-import android.support.wearable.view.FragmentGridPagerAdapter
-import android.support.wearable.view.GridViewPager
-import androidx.core.content.ContextCompat
-import androidx.fragment.app.FragmentActivity
+import android.speech.RecognizerIntent
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.getValue
 import com.alchemiasoft.books.R
-import com.alchemiasoft.books.fragment.AddNoteFragment
-import com.alchemiasoft.books.fragment.BuyBookFragment
-import com.alchemiasoft.books.fragment.InfoFragment
-import com.alchemiasoft.books.fragment.SettingsFragment
-import com.alchemiasoft.common.content.BookDB.Book
+import com.alchemiasoft.books.ui.BooksApp
+import com.alchemiasoft.books.ui.BooksViewModel
+import com.alchemiasoft.common.model.Book
 import com.alchemiasoft.common.sync.Event
-import com.alchemiasoft.common.util.UriUtil
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.GoogleApiAvailability
 import com.google.android.gms.common.api.GoogleApiClient
@@ -51,48 +41,53 @@ import com.google.android.gms.wearable.Wearable
 
 /**
  * Activity that displays some of the info about all the available books.
+ * The UI itself is built with Compose for Wear OS (see [BooksApp]).
  */
-class BooksActivity : FragmentActivity(), LoaderManager.LoaderCallbacks<Cursor>, GridViewPager.OnPageChangeListener,
-    GoogleApiClient.ConnectionCallbacks {
+class BooksActivity : ComponentActivity(), GoogleApiClient.ConnectionCallbacks {
 
-    /**
-     * UI references.
-     */
-    private lateinit var mPageIndicator: DotsPageIndicator
-    private lateinit var mViewPager: GridViewPager
-    private lateinit var mAdapter: BooksGridPagerAdapter
-    private lateinit var mCrossfadeDrawable: CrossfadeDrawable
+    private val mViewModel: BooksViewModel by viewModels()
 
     /**
      * Client used by the wearable api to notify about the current book.
      */
     private var mGoogleApiClient: GoogleApiClient? = null
 
-    private var mOldRow = NOT_VALID
+    /**
+     * Book the user is currently looking at.
+     */
+    private var mShownBookId: Long? = null
+
+    /**
+     * Callback waiting for the result of the free-form speech recognition.
+     */
+    private var mOnNotes: ((String) -> Unit)? = null
+
+    private val mSpeechLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val notes = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)?.firstOrNull()
+        if (result.resultCode == RESULT_OK && !notes.isNullOrEmpty()) {
+            mOnNotes?.invoke(notes)
+        }
+        mOnNotes = null
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_books)
-        // Getting UI references
-        mPageIndicator = findViewById(R.id.pager_indicator)
-        mViewPager = findViewById(R.id.pager)
-        // Drawable used to make the UI more captivating
-        mCrossfadeDrawable = CrossfadeDrawable()
-        mCrossfadeDrawable.setFading(ContextCompat.getDrawable(this, R.drawable.fading_background))
-        findViewById<android.view.View>(android.R.id.content).background = mCrossfadeDrawable
-        // Creating and Setting the Pager adapter
-        mAdapter = BooksGridPagerAdapter(this)
-        mViewPager.adapter = mAdapter
-        // Connecting the GridViewPager to the indicator
-        mPageIndicator.setPager(mViewPager)
-        // Adding the page change listener
-        mViewPager.setOnPageChangeListener(this)
+        setContent {
+            val state by mViewModel.state.collectAsStateWithLifecycle()
+            BooksApp(
+                state = state,
+                onBookShown = ::onBookShown,
+                onBuy = mViewModel::buy,
+                onAddNotes = mViewModel::addNotes,
+                onRequestNotes = ::requestNotes,
+                onSetting = mViewModel::applySetting,
+                onDone = ::finish,
+            )
+        }
         // Creating the GoogleApiClient for the Wearable api (if available)
         if (GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(this) == ConnectionResult.SUCCESS) {
             mGoogleApiClient = GoogleApiClient.Builder(this).addConnectionCallbacks(this).addApi(Wearable.API).build()
         }
-        // Initializing the loader
-        loaderManager.initLoader(LOADER_ID_SUGGESTIONS, null, this)
     }
 
     override fun onStart() {
@@ -107,56 +102,19 @@ class BooksActivity : FragmentActivity(), LoaderManager.LoaderCallbacks<Cursor>,
         mGoogleApiClient?.disconnect()
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        loaderManager.destroyLoader(LOADER_ID_SUGGESTIONS)
-    }
-
     override fun onConnected(bundle: Bundle?) {
-        if (mOldRow != NOT_VALID) {
-            notifyPhoneAbout(mAdapter.getBookId(mOldRow))
-        }
+        mShownBookId?.let(::notifyPhoneAbout)
     }
 
     override fun onConnectionSuspended(status: Int) {
     }
 
-    override fun onCreateLoader(id: Int, args: Bundle?): Loader<Cursor> {
-        require(id == LOADER_ID_SUGGESTIONS) { "Loader id=$id is not supported!" }
-        return CursorLoader(this, UriUtil.withLimit(Book.CONTENT_URI, MAX_ROWS), PROJECTION, SELECTION, SELECTION_ARGS, ORDER_BY)
-    }
-
-    override fun onLoadFinished(loader: Loader<Cursor>, data: Cursor?) {
-        mAdapter.swapCursor(data)
-        mViewPager.setCurrentItem(0, 0)
-        onPageSelected(0, 0)
-    }
-
-    override fun onLoaderReset(loader: Loader<Cursor>) {
-        // While the activity is being destroyed the pager's fragments are already gone: notifying the
-        // legacy FragmentGridPagerAdapter at that point crashes (NPE in applyItemPosition), so just drop the cursor.
-        mAdapter.swapCursor(null, notify = !isDestroyed)
-    }
-
-    override fun onPageScrolled(row: Int, column: Int, rowOffset: Float, columnOffset: Float, rowOffsetPixels: Int, columnOffsetPixels: Int) {
-        mPageIndicator.onPageScrolled(row, column, rowOffset, columnOffset, rowOffsetPixels, columnOffsetPixels)
-    }
-
-    override fun onPageSelected(row: Int, column: Int) {
-        if (mOldRow != row) {
-            mOldRow = row
-            mCrossfadeDrawable.setBase(mAdapter.getBaseDrawable(row))
-            // Notifying that the user is looking at the X row.
-            if (mGoogleApiClient?.isConnected == true) {
-                notifyPhoneAbout(mAdapter.getBookId(row))
-            }
+    private fun onBookShown(book: Book) {
+        mShownBookId = book.id
+        // Notifying that the user is looking at this book.
+        if (mGoogleApiClient?.isConnected == true) {
+            notifyPhoneAbout(book.id)
         }
-        mCrossfadeDrawable.setProgress(if (mAdapter.isCard(row, column)) NO_FADE else PARTIAL_FADE)
-        mPageIndicator.onPageSelected(row, column)
-    }
-
-    override fun onPageScrollStateChanged(state: Int) {
-        mPageIndicator.onPageScrollStateChanged(state)
     }
 
     /**
@@ -170,164 +128,13 @@ class BooksActivity : FragmentActivity(), LoaderManager.LoaderCallbacks<Cursor>,
     }
 
     /**
-     * Adapter used to display books in pages. Following the Android Wear Design Guidelines,
-     * all the elements will be displayed per row and in the columns the user will be able to find
-     * detailed info and button actions.
-     *
-     * e.g.:
-     *          column 1    column 2    column3     column N
-     *          _____________________________________________
-     * row 1  | title 1     info 1      action 3    action N
-     * row 2  | title 2     ...
-     * row N  |  ...
+     * Starts the free-form speech recognition used to dictate notes.
      */
-    private class BooksGridPagerAdapter(private val mActivity: Activity) : FragmentGridPagerAdapter(mActivity.fragmentManager) {
-
-        /**
-         * Cursor used as books source.
-         */
-        private var mCursor: Cursor? = null
-
-        override fun getFragment(row: Int, column: Int): Fragment {
-            val cursor = mCursor
-            // Checking if it's empty
-            if (cursor == null || cursor.count == 0) {
-                return when (column) {
-                    EMPTY_INFO -> InfoFragment.Builder.create(R.string.no_suggestions).build()
-                    EMPTY_SETTINGS -> SettingsFragment.Builder.create().build()
-                    else -> throw IllegalArgumentException("getFragment(row=$row, column=$column)")
-                }
-            }
-            // Positioning the cursor at the right row
-            cursor.moveToPosition(row)
-            // Matching the fragment by column
-            return when (column) {
-                TITLE -> CardFragment.create(cursor.string(Book.TITLE), cursor.string(Book.AUTHOR))
-                INFO -> CardFragment.create(mActivity.getString(R.string.description), cursor.string(Book.DESCRIPTION))
-                NOTES -> {
-                    val notes = cursor.string(Book.NOTES)
-                    if (notes.isNullOrEmpty()) {
-                        // Button to catch a note
-                        AddNoteFragment.Builder.create(cursor.long(Book._ID)).build()
-                    } else {
-                        CardFragment.create(mActivity.getString(R.string.notes), notes)
-                    }
-                }
-                // Button to buy
-                BUY -> BuyBookFragment.Builder.create(cursor.long(Book._ID)).build()
-                SETTINGS -> SettingsFragment.Builder.create().build()
-                else -> throw IllegalArgumentException("getFragment(row=$row, column=$column)")
-            }
-        }
-
-        fun isCard(row: Int, column: Int): Boolean {
-            val cursor = mCursor
-            if (cursor == null || cursor.count == 0) {
-                return false
-            }
-            return when {
-                column < NOTES -> true
-                column > NOTES -> false
-                else -> {
-                    cursor.moveToPosition(row)
-                    !cursor.string(Book.NOTES).isNullOrEmpty()
-                }
-            }
-        }
-
-        override fun getRowCount(): Int = if (isEmpty()) EMPTY_ROW_COUNT else mCursor!!.count
-
-        override fun getColumnCount(row: Int): Int = if (isEmpty()) EMPTY_COLUMN_COUNT else COLUMNS
-
-        fun swapCursor(cursor: Cursor?, notify: Boolean = true): Cursor? {
-            val oldCursor = mCursor
-            mCursor = cursor
-            if (notify) {
-                notifyDataSetChanged()
-            }
-            return oldCursor
-        }
-
-        fun isEmpty(): Boolean = mCursor.let { it == null || it.count == 0 }
-
-        fun getBookId(row: Int): Long {
-            val cursor = mCursor
-            if (cursor == null || cursor.count == 0) {
-                return NOT_VALID.toLong()
-            }
-            // Positioning the cursor at the right row
-            cursor.moveToPosition(row)
-            return cursor.long(Book._ID)
-        }
-
-        fun getBaseDrawable(row: Int): Drawable? {
-            val cursor = mCursor
-            if (cursor == null || cursor.count == 0) {
-                return ContextCompat.getDrawable(mActivity, R.drawable.tile_sad)
-            }
-            // Positioning the cursor at the right row
-            cursor.moveToPosition(row)
-            val tile = when (cursor.string(Book.TAG)) {
-                "javascript" -> R.drawable.tile_javascript
-                "java" -> R.drawable.tile_java
-                "git" -> R.drawable.tile_git
-                else -> R.drawable.tile_android
-            }
-            return ContextCompat.getDrawable(mActivity, tile)
-        }
-
-        private fun Cursor.string(column: String): String? = getString(getColumnIndexOrThrow(column))
-
-        private fun Cursor.long(column: String): Long = getLong(getColumnIndexOrThrow(column))
-
-        private companion object {
-            /**
-             * Columns for valid cursor.
-             */
-            const val TITLE = 0
-            const val INFO = 1
-            const val NOTES = 2
-            const val BUY = 3
-            const val SETTINGS = 4
-            const val COLUMNS = 5
-
-            /**
-             * Columns for empty.
-             */
-            const val EMPTY_INFO = 0
-            const val EMPTY_SETTINGS = 1
-            const val EMPTY_ROW_COUNT = 1
-            const val EMPTY_COLUMN_COUNT = 2
-        }
-    }
-
-    private companion object {
-
-        /**
-         * Loader id.
-         */
-        const val LOADER_ID_SUGGESTIONS = 23
-
-        /**
-         * Usually we don't want to display more than 5 rows in the 2D Picker.
-         * This is done because we don't want to display tons of content to the user.
-         */
-        const val MAX_ROWS = 5
-
-        const val NOT_VALID = -1
-
-        /**
-         * Fading values.
-         */
-        const val NO_FADE = 0f
-        const val PARTIAL_FADE = 0.8f
-
-        /**
-         * Query params.
-         */
-        val PROJECTION = arrayOf(Book._ID, Book.TITLE, Book.AUTHOR, Book.DESCRIPTION, Book.NOTES, Book.TAG)
-        const val SELECTION = Book.OWNED + " = ?"
-        val SELECTION_ARGS = arrayOf("0")
-        val ORDER_BY: String? = null
+    private fun requestNotes(onNotes: (String) -> Unit) {
+        mOnNotes = onNotes
+        val intent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH)
+            .putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM)
+            .putExtra(RecognizerIntent.EXTRA_PROMPT, getString(R.string.what_notes))
+        mSpeechLauncher.launch(intent)
     }
 }
